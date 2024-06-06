@@ -11,8 +11,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "mobx": "^6.12.3",
+    "mobx-react": "^7.6.0",
+    "mobx-react-lite": "^4.0.7",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.23.1",
+    "react-toastify": "^10.0.5",
+    "semantic-ui-css": "^2.5.0",
+    "semantic-ui-react": "^3.0.0-beta.2"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
