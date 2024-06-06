@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button, Container, Form, Header } from 'semantic-ui-react';
 import IncomeForm from './IncomeForm';
 import ExpenseForm from './ExpenseForm';
+import '../../App.css';
 
 type Expense = {
   description: string;
@@ -21,16 +22,22 @@ const BudgetForm = () => {
 
   const [totalIncome, setTotalIncome] = useState<number>(0);
   const [totalExpense, setTotalExpense] = useState<number>(0);
+  const [netIncome, setNetIncome] = useState<number>(0);
 
   useEffect(() => {
     let totalExpense = 0;
     expenses.forEach((expense) => {
-      totalExpense += expense.amount; // Legg til beløpet som utgift uavhengig av om det er positivt eller negativt
+      totalExpense += expense.amount;
     });
-    setTotalExpense(totalExpense); // Oppdater totalutgiftene
+    setTotalExpense(totalExpense);
   }, [expenses]);
-  
-  
+
+  useEffect(() => {
+    const grossIncome = income.grossAmount;
+    const netIncome = grossIncome - (grossIncome * income.taxPercentage) / 100;
+    setNetIncome(netIncome);
+    setTotalIncome(netIncome); // Oppdater total inntekt til netto inntekt
+  }, [income]);
 
   const handleIncomeChange = (income: Income) => {
     setIncome(income);
@@ -70,20 +77,26 @@ const BudgetForm = () => {
           />
         </Form.Field>
         <IncomeForm onIncomeChange={handleIncomeChange} />
+        <div style={{ marginTop: '20px' }}>
+          <Header as="h5">Netto Inntekt</Header>
+          <p>{netIncome}</p>
+        </div>
         <ExpenseForm
           expenses={expenses}
           onExpenseChange={handleExpenseChange}
           onAddExpense={handleAddExpense}
           onRemoveExpense={handleRemoveExpense}
         />
-          <div style={{ marginTop: '20px' }}>
-        <Header as="h4">Totalt Inntekt</Header>
-        <p>{totalIncome}</p>
-      </div>
-      <div style={{ marginTop: '20px' }}>
-        <Header as="h4">Totalt Utgift</Header>
-        <p>{totalExpense}</p>
-      </div>
+        <div style={{ display: 'flex', marginBottom: '3rem', marginTop: '3rem'}}>
+            <div style={{ marginTop: '20px', paddingRight: '1rem' }}>
+              <Header as="h3">Totalt Inntekt</Header>
+              <p>{totalIncome}</p>
+            </div>
+            <div style={{ marginTop: '20px', paddingLeft: '1rem' }}>
+              <Header as="h3">Totalt Utgift</Header>
+              <p>{totalExpense}</p>
+            </div>
+        </div>
         <Button type="submit" primary>Få Oversikt</Button>
       </Form>
     </Container>

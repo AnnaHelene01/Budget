@@ -1,3 +1,34 @@
+
+/* --- NavBar responsiv --- */
+.navbar {
+  background-color: #1b1c1d;
+  padding: 1rem 3rem;
+  margin: 0;
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+  top: 0;
+}
+
+.sidebar {
+  position: fixed;
+  top: 4rem; /* Plasserer sidebaren like under den vanlige menyen */
+  left: -300px;
+  width: 300px;
+  height: calc(100% - 4rem); /* Setter høyden til vinduet minus høyden på den vanlige menyen */
+  background-color: #1b1c1d;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+
+
+
+/*  --- Budsjett skjema container ---  */
 .budget-form-container {
   background-color: #f2f2f2; /* Grå bakgrunn */
   padding: 5rem; /* Luftplass på toppen og bunnen */

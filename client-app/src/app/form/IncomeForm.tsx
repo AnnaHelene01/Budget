@@ -10,8 +10,9 @@ const IncomeForm: React.FC<IncomeFormProps> = ({ onIncomeChange }) => {
 
   const handleIncomeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setIncome({ ...income, [name]: value });
-    onIncomeChange({ ...income, [name]: value }); // Oppdater parent state
+    const parsedValue = parseFloat(value);
+    setIncome({ ...income, [name]: parsedValue });
+    onIncomeChange({ ...income, [name]: parsedValue }); // Oppdater parent state
   };
 
   return (

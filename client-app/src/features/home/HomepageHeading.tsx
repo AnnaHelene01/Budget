@@ -1,11 +1,12 @@
 import { Container, Header, Button, Icon } from 'semantic-ui-react';
+import '../../App.css';
 
 interface Props {
-    mobile: any;
+  mobile: any;
 }
 
 const HomepageHeading = ({ mobile }: Props) => (
-  <Container fluid textAlign='center' style={{ backgroundColor: '#1b1c1d', padding: '3rem 0', color: 'white', marginBottom: '0rem' }}>
+  <Container fluid textAlign='center' style={{ backgroundColor: '#1b1c1d', padding: '3rem 0', color: 'white' }}>
     <Header
       as='h1'
       content='Få kontroll på økonomien!'

@@ -3,7 +3,6 @@ import NavBar from './NavBar';
 import HomepageHeading from '../../features/home/HomepageHeading';
 import ContentSection from '../../features/home/ContentSection';
 
-
 const App = () => (
   <Router>
     <NavBar fixed={null} />
