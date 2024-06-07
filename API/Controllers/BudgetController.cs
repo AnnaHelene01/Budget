@@ -1,67 +1,31 @@
+using Application.Budgets;
 using Domain;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Persistence;
+
 
 namespace API.Controllers
 {
     public class BudgetController : BaseApiController
     {
-        private readonly BudgetContext _context;
-        private readonly ILogger<BudgetController> _logger;
 
-        public BudgetController(BudgetContext context, ILogger<BudgetController> logger)
-        {
-            _context = context;
-            _logger = logger;
-        }
-
-        [HttpGet] //api/budgets
+        [HttpGet] //api/budget
         public async Task<ActionResult<List<Budget>>> GetBudgets()
         {
-            _logger.LogInformation("GetBudgets called");
-            try
-            {
-                var budgets = await _context.Budgets
-                    .Include(b => b.Incomes)
-                    .Include(b => b.Expenses)
-                    .ToListAsync();
-                _logger.LogInformation("Budgets retrieved successfully");
-                return Ok(budgets);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving budgets");
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            return await Mediator.Send(new List.Query());
         }
 
-        [HttpGet("{id}")] //api/budgets/fedkek
+        [HttpGet("{id}")] //api/budget/fedkek
         public async Task<ActionResult<Budget>> GetBudget(Guid id)
         {
-            _logger.LogInformation("GetBudget called with id: {Id}", id);
-            try
-            {
-                var budget = await _context.Budgets
-                    .Include(b => b.Incomes)
-                    .Include(b => b.Expenses)
-                    .FirstOrDefaultAsync(b => b.Id == id);
+            return await Mediator.Send(new Details.Query{Id = id});
+        }
 
-                if (budget == null)
-                {
-                    _logger.LogWarning("Budget with id {Id} not found", id);
-                    return NotFound();
-                }
-
-                _logger.LogInformation("Budget retrieved successfully");
-                return Ok(budget);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving budget with id: {Id}", id);
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+        [HttpPost] //api/budget
+        public async Task<IActionResult> CreateBudget(Budget budget)
+        {
+            await Mediator.Send(new Create.Command {Budget = budget});
+            return Ok();
         }
     }
 }

@@ -1,10 +1,11 @@
 import { Button, Form, Grid, Header, Image, Message, Segment } from 'semantic-ui-react'
+import budgetLogo from '../../../public/assets/logo-placeholder.png';
 
 const RegisterForm = () => (
   <Grid textAlign='center' style={{ height: '100vh' }} verticalAlign='middle'>
     <Grid.Column style={{ maxWidth: 450 }}>
-      <Header as='h2' color='teal' textAlign='center'>
-        <Image src='/logo.png' /> Registrer bruker idag!
+      <Header as='h2' textAlign='center' style={{ color: '#1b1c1d' }}>
+        <Image src={budgetLogo} /> Registrer bruker idag!
       </Header>
       <Form size='large'>
         <Segment stacked>

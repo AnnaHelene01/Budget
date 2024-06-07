@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from "react";
 import { Menu, Container, Button, Icon } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import '../../App.css';
 
 interface NavBarProps {
@@ -10,6 +10,7 @@ interface NavBarProps {
 const NavBar = ({ fixed }: NavBarProps) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [showSidebar, setShowSidebar] = useState(windowWidth <= 768);
+  const location = useLocation(); // Få den nåværende stien
 
   useEffect(() => {
     const handleResize = () => {
@@ -32,18 +33,18 @@ const NavBar = ({ fixed }: NavBarProps) => {
     <>
       <Menu fixed={fixed || undefined} className="navbar">
         <Container>
-          <Menu.Item as={Link} to='/' active>
+          <Menu.Item as={Link} to='/' active={location.pathname === '/'}>
             Hjem
           </Menu.Item>
           {windowWidth > 768 && (
             <>
-              <Menu.Item as={Link} to='/budgets'>
+              <Menu.Item as={Link} to='/budgets' active={location.pathname === '/budgets'}>
                 Budsjett
               </Menu.Item>
-              <Menu.Item as={Link} to='/profile'>
+              <Menu.Item as={Link} to='/profile' active={location.pathname === '/profile'}>
                 Min Profil
               </Menu.Item>
-              <Menu.Item as={Link} to='/about'>
+              <Menu.Item as={Link} to='/about' active={location.pathname === '/about'}>
                 Om Oss
               </Menu.Item>
             </>
@@ -66,16 +67,16 @@ const NavBar = ({ fixed }: NavBarProps) => {
       </Menu>
       <div className={showSidebar ? 'sidebar open' : 'sidebar'}>
         <Menu inverted vertical>
-          <Menu.Item as={Link} to='/' active>
+          <Menu.Item as={Link} to='/' active={location.pathname === '/'}>
             Hjem
           </Menu.Item>
-          <Menu.Item as={Link} to='/budgets'>
-                Budsjett
+          <Menu.Item as={Link} to='/budgets' active={location.pathname === '/budgets'}>
+            Budsjett
           </Menu.Item>
-          <Menu.Item as={Link} to='/profile'>
+          <Menu.Item as={Link} to='/profile' active={location.pathname === '/profile'}>
             Min Profil
           </Menu.Item>
-          <Menu.Item as={Link} to='/about'>
+          <Menu.Item as={Link} to='/about' active={location.pathname === '/about'}>
             Om oss
           </Menu.Item>
           <Menu.Item>

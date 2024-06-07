@@ -17,12 +17,12 @@ function DisplayBudget() {
     return (
         <>
         <Container style={{ marginTop: '8rem' }}>
-            <h1>Display Budget</h1>
+            <h1>Mine Budsjetter</h1>
             <ul>
                 {budgets.map((budget: any) => (
-                    <li key={budget.id}>
-                        {budget.name}
-                    </li>
+                    <h3 key={budget.id}>
+                        - {budget.name}
+                    </h3>
                 ))}
             </ul>
         </Container>
