@@ -1,55 +1,70 @@
-import React, { useState } from 'react';
-import { Form, Header } from 'semantic-ui-react';
+import React from 'react';
+import { Form, Header, Button, Icon } from 'semantic-ui-react';
 
 interface IncomeFormProps {
-  onIncomeChange: (income: any) => void;
+  incomes: Array<{ source: string, grossAmount: number, taxPercentage: number }>;
+  onIncomeChange: (index: number, income: any) => void;
+  onAddIncome: () => void;
+  onRemoveIncome: (index: number) => void;
 }
 
-const IncomeForm: React.FC<IncomeFormProps> = ({ onIncomeChange }) => {
-  const [income, setIncome] = useState({ source: '', grossAmount: 0, taxPercentage: 0 });
-
-  const handleIncomeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+const IncomeForm: React.FC<IncomeFormProps> = ({ incomes, onIncomeChange, onAddIncome, onRemoveIncome }) => {
+  const handleIncomeChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const parsedValue = parseFloat(value);
-    setIncome({ ...income, [name]: parsedValue });
-    onIncomeChange({ ...income, [name]: parsedValue }); // Oppdater parent state
+    const parsedValue = name === "grossAmount" || name === "taxPercentage" ? parseFloat(value) : value;
+    onIncomeChange(index, { ...incomes[index], [name]: parsedValue });
   };
 
   return (
     <>
       <Header as="h3">Inntekter</Header>
-      <Form.Field>
-        <label>Kilde</label>
-        <input
-          type="text"
-          name="source"
-          placeholder="Enter income source"
-          value={income.source}
-          onChange={handleIncomeChange}
-        />
-      </Form.Field>
-      <Form.Group widths="equal">
-        <Form.Field>
-          <label>Brutto i måneden</label>
-          <input
-            type="number"
-            name="grossAmount"
-            placeholder="Enter gross amount"
-            value={income.grossAmount}
-            onChange={handleIncomeChange}
-          />
-        </Form.Field>
-        <Form.Field>
-          <label>Skatt i prosent</label>
-          <input
-            type="number"
-            name="taxPercentage"
-            placeholder="Enter tax percentage"
-            value={income.taxPercentage}
-            onChange={handleIncomeChange}
-          />
-        </Form.Field>
-      </Form.Group>
+      {incomes.map((income, index) => (
+        <div key={index} style={{ marginBottom: '20px' }}>
+          <Form.Field>
+            <label>Kilde</label>
+            <input
+              type="text"
+              name="source"
+              placeholder="Enter income source"
+              value={income.source}
+              onChange={(e) => handleIncomeChange(index, e)}
+            />
+          </Form.Field>
+          <Form.Group widths="equal">
+            <Form.Field>
+              <label>Brutto i måneden</label>
+              <input
+                type="number"
+                name="grossAmount"
+                placeholder="Enter gross amount"
+                value={income.grossAmount}
+                onChange={(e) => handleIncomeChange(index, e)}
+              />
+            </Form.Field>
+            <Form.Field>
+              <label>Skatt i prosent</label>
+              <input
+                type="number"
+                name="taxPercentage"
+                placeholder="Enter tax percentage"
+                value={income.taxPercentage}
+                onChange={(e) => handleIncomeChange(index, e)}
+              />
+            </Form.Field>
+            <Button
+              icon
+              color='red'
+              onClick={() => onRemoveIncome(index)}
+              style={{ alignSelf: 'center', marginTop: '1.5rem' }}
+            >
+              <Icon name='trash' />
+            </Button>
+          </Form.Group>
+        </div>
+      ))}
+      <Button onClick={onAddIncome} color='green'>
+        Legg til inntekt
+      </Button>
     </>
   );
 };

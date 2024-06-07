@@ -16,13 +16,13 @@ type Income = {
 };
 
 const BudgetForm = () => {
-  const [income, setIncome] = useState<Income>({ source: '', grossAmount: 0, taxPercentage: 0 });
+  const [incomes, setIncomes] = useState<Income[]>([{ source: '', grossAmount: 0, taxPercentage: 0 }]);
   const [expenses, setExpenses] = useState<Expense[]>([{ description: '', amount: 0 }]);
   const [budgetName, setBudgetName] = useState('');
-
   const [totalIncome, setTotalIncome] = useState<number>(0);
   const [totalExpense, setTotalExpense] = useState<number>(0);
   const [netIncome, setNetIncome] = useState<number>(0);
+  const [remainingAmount, setRemainingAmount] = useState<number>(0);
 
   useEffect(() => {
     let totalExpense = 0;
@@ -33,14 +33,37 @@ const BudgetForm = () => {
   }, [expenses]);
 
   useEffect(() => {
-    const grossIncome = income.grossAmount;
-    const netIncome = grossIncome - (grossIncome * income.taxPercentage) / 100;
-    setNetIncome(netIncome);
-    setTotalIncome(netIncome); // Oppdater total inntekt til netto inntekt
-  }, [income]);
+    let totalGrossIncome = 0;
+    let totalNetIncome = 0;
 
-  const handleIncomeChange = (income: Income) => {
-    setIncome(income);
+    incomes.forEach((income) => {
+      totalGrossIncome += income.grossAmount;
+      totalNetIncome += income.grossAmount - (income.grossAmount * income.taxPercentage) / 100;
+    });
+
+    setTotalIncome(totalGrossIncome);
+    setNetIncome(totalNetIncome);
+  }, [incomes]);
+
+  useEffect(() => {
+    const remaining = totalIncome - totalExpense;
+    setRemainingAmount(remaining);
+  }, [totalIncome, totalExpense]);
+
+  const handleIncomeChange = (index: number, income: Income) => {
+    const updatedIncomes = [...incomes];
+    updatedIncomes[index] = income;
+    setIncomes(updatedIncomes);
+  };
+
+  const handleAddIncome = () => {
+    setIncomes([...incomes, { source: '', grossAmount: 0, taxPercentage: 0 }]);
+  };
+
+  const handleRemoveIncome = (index: number) => {
+    const updatedIncomes = [...incomes];
+    updatedIncomes.splice(index, 1);
+    setIncomes(updatedIncomes);
   };
 
   const handleExpenseChange = (index: number, expense: Expense) => {
@@ -60,7 +83,7 @@ const BudgetForm = () => {
   };
 
   const handleSubmit = () => {
-    console.log('Submitting:', { budgetName, income, expenses });
+    console.log('Submitting:', { budgetName, incomes, expenses });
   };
 
   return (
@@ -76,7 +99,12 @@ const BudgetForm = () => {
             onChange={(e) => setBudgetName(e.target.value)}
           />
         </Form.Field>
-        <IncomeForm onIncomeChange={handleIncomeChange} />
+        <IncomeForm 
+          incomes={incomes} 
+          onIncomeChange={handleIncomeChange} 
+          onAddIncome={handleAddIncome} 
+          onRemoveIncome={handleRemoveIncome} 
+        />
         <div style={{ marginTop: '20px' }}>
           <Header as="h5">Netto Inntekt</Header>
           <p>{netIncome}</p>
@@ -92,9 +120,13 @@ const BudgetForm = () => {
               <Header as="h3">Totalt Inntekt</Header>
               <p>{totalIncome}</p>
             </div>
-            <div style={{ marginTop: '20px', paddingLeft: '1rem' }}>
+            <div style={{ marginTop: '20px', paddingLeft: '1rem', paddingRight: '1rem' }}>
               <Header as="h3">Totalt Utgift</Header>
               <p>{totalExpense}</p>
+            </div>
+            <div style={{ marginTop: '20px', paddingLeft: '1rem' }}>
+              <Header as="h3">Sum Penger Igjen</Header>
+              <p>{remainingAmount}</p>
             </div>
         </div>
         <Button type="submit" primary>Få Oversikt</Button>

@@ -1,13 +1,21 @@
 
 /* --- NavBar responsiv --- */
 .navbar {
-  background-color: #1b1c1d;
+  background-color: #1b1c1d !important;
   padding: 1rem 3rem;
   margin: 0;
   position: fixed;
   width: 100%;
   z-index: 1000;
   top: 0;
+}
+
+.navbar .item, .navbar .active {
+  color: white !important;
+}
+
+.navbar .active {
+  border-bottom: 2px solid white; /* Legger til hvit underlinje for aktivt element */
 }
 
 .sidebar {

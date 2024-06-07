@@ -8,6 +8,6 @@ namespace Domain
         public string Source { get; set; } // Kilde til inntekten (f.eks. lønn, sidejobb)
         public decimal GrossAmount { get; set; } // Brutto beløpet
         public decimal TaxPercentage { get; set; } // Skatteprosent
-        public decimal NetAmount => GrossAmount * (1 - TaxPercentage / 100); // Netto beløp etter skatt
+        public decimal NetAmount { get; set; } // Netto beløp
     }
 }
