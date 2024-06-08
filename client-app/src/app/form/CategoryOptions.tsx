@@ -71,6 +71,7 @@ export const categoryOptions = [
         { key: 'generell', text: 'Generell', value: 'generell' },
         { key: 'mobil', text: 'Mobilregning', value: 'mobilregning' },
         { key: 'internett', text: 'Internettregning', value: 'internett' },
+        { key: 'forbrukslån', text: 'Forbrukslån', value: 'forbrukslån' },
         { key: 'reisekostnad', text: 'Reisekostnader og ferieplanlegging', value: 'reisekostnad' },
       ]
   };

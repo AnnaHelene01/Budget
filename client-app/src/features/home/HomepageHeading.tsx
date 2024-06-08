@@ -9,7 +9,7 @@ const HomepageHeading = ({ mobile }: Props) => (
   <Container fluid textAlign='center' style={{ backgroundColor: '#1b1c1d', padding: '3rem 0', color: 'white' }}>
     <Header
       as='h1'
-      content='Få kontroll på økonomien!'
+      content='Få kontroll på økonomien'
       inverted
       style={{
         fontSize: mobile ? '2em' : '4em',
@@ -20,7 +20,7 @@ const HomepageHeading = ({ mobile }: Props) => (
     />
     <Header
       as='h2'
-      content='Do whatever you want when you want to.'
+      content='Bli din beste ØkonomiPilot'
       inverted
       style={{
         fontSize: mobile ? '1.5em' : '1.7em',

@@ -1,30 +1,71 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Application.Budgets;
 using Domain;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.EntityFrameworkCore;
+using Persistence;
 
 namespace API.Controllers
 {
     public class BudgetController : BaseApiController
     {
+        private readonly BudgetContext _context;
+
+        public BudgetController(BudgetContext context)
+        {
+            _context = context;
+        }
 
         [HttpGet] //api/budget
         public async Task<ActionResult<List<Budget>>> GetBudgets()
         {
-            return await Mediator.Send(new List.Query());
+            var budgets = await _context.Budgets
+                .Include(b => b.Incomes)
+                .Include(b => b.Expenses)
+                .ToListAsync();
+
+            return Ok(budgets);
         }
 
-        [HttpGet("{id}")] //api/budget/fedkek
+        [HttpGet("{id}")] //api/budget/{id}
         public async Task<ActionResult<Budget>> GetBudget(Guid id)
         {
-            return await Mediator.Send(new Details.Query{Id = id});
+            var budget = await _context.Budgets
+                .Include(b => b.Incomes)
+                .Include(b => b.Expenses)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (budget == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(budget);
         }
 
         [HttpPost] //api/budget
         public async Task<IActionResult> CreateBudget(Budget budget)
         {
-            await Mediator.Send(new Create.Command {Budget = budget});
+            _context.Budgets.Add(budget);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Edit(Guid id, Budget budget)
+        {
+            budget.Id = id;
+            await Mediator.Send(new Edit.Command { Budget = budget });
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await Mediator.Send(new Delete.Command{ Id = id });
+            
             return Ok();
         }
     }
