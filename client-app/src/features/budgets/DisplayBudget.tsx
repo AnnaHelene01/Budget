@@ -31,7 +31,7 @@ function DisplayBudget() {
                 {budgets.map((budget: Budget) => (
                     <Card
                         as={Link}
-                        to={`/budget/${budget.id}`}
+                        to={`/budgets/${budget.id}`}
                         key={budget.id}
                         header={budget.name}
                         meta={`Total Net Income: ${budget.totalNetIncome}`}

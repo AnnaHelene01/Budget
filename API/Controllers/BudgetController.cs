@@ -19,12 +19,12 @@ namespace API.Controllers
         }
 
         [HttpGet] //api/budget
-        public async Task<ActionResult<List<Budget>>> GetBudgets()
+        public async Task<ActionResult<List<Budget>>> GetBudgets(CancellationToken ct)
         {
             var budgets = await _context.Budgets
                 .Include(b => b.Incomes)
                 .Include(b => b.Expenses)
-                .ToListAsync();
+                .ToListAsync(ct);
 
             return Ok(budgets);
         }
