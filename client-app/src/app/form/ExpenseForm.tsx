@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Header, Dropdown, DropdownProps } from 'semantic-ui-react';
+import { Expense } from '../models/budget';
 import { categoryOptions, updateSubcategoryOptions } from './CategoryOptions';
 
 interface ExpenseFormProps {
-  onExpenseChange: (index: number, expense: any) => void;
+  onExpenseChange: (index: number, expense: Expense) => void;
   onAddExpense: () => void;
   onRemoveExpense: (index: number) => void;
-  expenses: any[];
+  expenses: Expense[];
 }
 
 const ExpenseForm: React.FC<ExpenseFormProps> = ({ onExpenseChange, onAddExpense, onRemoveExpense, expenses }) => {
@@ -20,8 +21,11 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onExpenseChange, onAddExpense
 
   const handleExpenseChange = (index: number, name: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    const parsedValue = parseFloat(value);
-    if (!isNaN(parsedValue)) {
+    let parsedValue: string | number = value;
+    if (name === 'amount') {
+      parsedValue = parseFloat(value);
+    }
+    if (!isNaN(parsedValue as number)) {
       const updatedExpense = { ...expenses[index], [name]: parsedValue };
       onExpenseChange(index, updatedExpense);
       recalculateTotalExpense();
@@ -29,17 +33,19 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onExpenseChange, onAddExpense
   };
 
   const handleCategoryChange = (index: number, value: string) => {
-    onExpenseChange(index, { ...expenses[index], category: value });
+    const updatedExpense = { ...expenses[index], category: value };
+    onExpenseChange(index, updatedExpense);
     const subcategoryOptions = updateSubcategoryOptions(value);
-    setSubcategoryOptions(subcategoryOptions);
+    setIndividualSubcategories((prev) => ({ ...prev, [index]: subcategoryOptions }));
   };
 
   const handleSubcategoryChange = (index: number, value: string) => {
-    onExpenseChange(index, { ...expenses[index], subcategory: value });
-    setIndividualSubcategories({
-      ...individualSubcategories,
+    const updatedExpense = { ...expenses[index], subcategory: value };
+    onExpenseChange(index, updatedExpense);
+    setIndividualSubcategories((prev) => ({
+      ...prev,
       [index]: updateSubcategoryOptions(expenses[index].category),
-    });
+    }));
   };
 
   const recalculateTotalExpense = () => {
@@ -103,12 +109,12 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onExpenseChange, onAddExpense
           <Button type="button" onClick={() => onRemoveExpense(index)}>Fjern</Button>
         </Form.Group>
       ))}
-      
+
       <Button type="button" onClick={onAddExpense}>Legg til utgift</Button>
       <div style={{ marginTop: '20px' }}>
-          <Header as="h5">SUM - Utgifter</Header>
-          <p>{totalExpense}</p>
-        </div>
+        <Header as="h5">SUM - Utgifter</Header>
+        <p>{totalExpense}</p>
+      </div>
     </>
   );
 };

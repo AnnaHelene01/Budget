@@ -1,138 +1,141 @@
-import { useEffect, useState } from 'react';
-import { Button, Container, Form, Header } from 'semantic-ui-react';
+import { useState, useEffect, ChangeEvent } from 'react';
+import { Button, Container, Form, Header, Icon, Segment } from 'semantic-ui-react';
 import IncomeForm from './IncomeForm';
 import ExpenseForm from './ExpenseForm';
 import '../../App.css';
+import { Budget, Income, Expense } from '../models/budget';
 
-type Expense = {
-  description: string;
-  amount: number;
-};
+interface Props {
+  budget: Budget | undefined;
+  closeForm: () => void;
+  createOrEdit: (budget: Budget) => void;
+}
 
-type Income = {
-  source: string;
-  grossAmount: number;
-  taxPercentage: number;
-};
+export default function BudgetForm({ budget: selectedBudget, closeForm, createOrEdit }: Props) {
+  const initialState: Budget = selectedBudget ?? {
+    id: '',
+    name: '',
+    totalNetIncome: 0,
+    totalExpense: 0,
+    incomes: [],
+    expenses: []
+  };
 
-const BudgetForm = () => {
-  const [incomes, setIncomes] = useState<Income[]>([{ source: '', grossAmount: 0, taxPercentage: 0 }]);
-  const [expenses, setExpenses] = useState<Expense[]>([{ description: '', amount: 0 }]);
-  const [budgetName, setBudgetName] = useState('');
-  const [totalIncome, setTotalIncome] = useState<number>(0);
-  const [totalExpense, setTotalExpense] = useState<number>(0);
-  const [netIncome, setNetIncome] = useState<number>(0);
-  const [remainingAmount, setRemainingAmount] = useState<number>(0);
-
-  useEffect(() => {
-    let totalExpense = 0;
-    expenses.forEach((expense) => {
-      totalExpense += expense.amount;
-    });
-    setTotalExpense(totalExpense);
-  }, [expenses]);
+  const [budget, setBudget] = useState<Budget>(initialState);
 
   useEffect(() => {
-    let totalGrossIncome = 0;
-    let totalNetIncome = 0;
-
-    incomes.forEach((income) => {
-      totalGrossIncome += income.grossAmount;
-      totalNetIncome += income.grossAmount - (income.grossAmount * income.taxPercentage) / 100;
-    });
-
-    setTotalIncome(totalGrossIncome);
-    setNetIncome(totalNetIncome);
-  }, [incomes]);
+    const totalExpense = budget.expenses.reduce((acc, expense) => acc + expense.amount, 0);
+    setBudget((prev) => ({ ...prev, totalExpense }));
+  }, [budget.expenses]);
 
   useEffect(() => {
-    const remaining = totalIncome - totalExpense;
-    setRemainingAmount(remaining);
-  }, [totalIncome, totalExpense]);
+    const totalGrossIncome = budget.incomes.reduce((acc, income) => acc + income.grossAmount, 0);
+    const totalNetIncome = budget.incomes.reduce(
+      (acc, income) => acc + income.grossAmount - (income.grossAmount * income.taxPercentage) / 100,
+      0
+    );
+    setBudget((prev) => ({ ...prev, totalNetIncome, totalIncome: totalGrossIncome }));
+  }, [budget.incomes]);
 
-  const handleIncomeChange = (index: number, income: Income) => {
-    const updatedIncomes = [...incomes];
-    updatedIncomes[index] = income;
-    setIncomes(updatedIncomes);
+  useEffect(() => {
+    const remainingAmount = budget.totalNetIncome - budget.totalExpense;
+    setBudget((prev) => ({ ...prev, remainingAmount }));
+  }, [budget.totalNetIncome, budget.totalExpense]);
+
+  function handleSubmit() {
+    createOrEdit(budget);
+  }
+
+  function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    const { name, value } = event.target;
+    setBudget({ ...budget, [name]: value });
+  }
+
+  const handleIncomeChange = (index: number, updatedIncome: Income) => {
+    const updatedIncomes = [...budget.incomes];
+    updatedIncomes[index] = updatedIncome;
+    setBudget({ ...budget, incomes: updatedIncomes });
   };
 
   const handleAddIncome = () => {
-    setIncomes([...incomes, { source: '', grossAmount: 0, taxPercentage: 0 }]);
+    setBudget({ ...budget, incomes: [...budget.incomes, { id: '', source: '', grossAmount: 0, netAmount: 0, taxPercentage: 0 }] });
   };
 
   const handleRemoveIncome = (index: number) => {
-    const updatedIncomes = [...incomes];
+    const updatedIncomes = [...budget.incomes];
     updatedIncomes.splice(index, 1);
-    setIncomes(updatedIncomes);
+    setBudget({ ...budget, incomes: updatedIncomes });
   };
 
-  const handleExpenseChange = (index: number, expense: Expense) => {
-    const updatedExpenses = [...expenses];
-    updatedExpenses[index] = expense;
-    setExpenses(updatedExpenses);
+  const handleExpenseChange = (index: number, updatedExpense: Expense) => {
+    const updatedExpenses = [...budget.expenses];
+    updatedExpenses[index] = updatedExpense;
+    setBudget({ ...budget, expenses: updatedExpenses });
   };
 
   const handleAddExpense = () => {
-    setExpenses([...expenses, { description: '', amount: 0 }]);
+    setBudget({ ...budget, expenses: [...budget.expenses, { id: '', description: '', amount: 0, category: '', subcategory: '' }] });
   };
 
   const handleRemoveExpense = (index: number) => {
-    const updatedExpenses = [...expenses];
+    const updatedExpenses = [...budget.expenses];
     updatedExpenses.splice(index, 1);
-    setExpenses(updatedExpenses);
-  };
-
-  const handleSubmit = () => {
-    console.log('Submitting:', { budgetName, incomes, expenses });
+    setBudget({ ...budget, expenses: updatedExpenses });
   };
 
   return (
-    <Container className="budget-form-container">
-      <Header as="h2">BUDSJETT SKJEMA</Header>
-      <Form onSubmit={handleSubmit}>
+    <Container>
+    <Header as="h2" icon textAlign="center">
+      <Icon name="money bill alternate" circular />
+      <Header.Content>Budsjett Skjema</Header.Content>
+    </Header>
+
+    <Segment>
+      <Header as="h3">
+        <Icon name="edit" />
+        <Header.Content>Budsjett Navn</Header.Content>
+      </Header>
+      <Form onSubmit={handleSubmit} autoComplete='off'>
         <Form.Field>
-          <label>Budsjett Navn</label>
           <input
             type="text"
             placeholder="Enter budget name"
-            value={budgetName}
-            onChange={(e) => setBudgetName(e.target.value)}
+            value={budget.name}
+            name="name"
+            onChange={handleInputChange}
           />
         </Form.Field>
-        <IncomeForm 
-          incomes={incomes} 
-          onIncomeChange={handleIncomeChange} 
-          onAddIncome={handleAddIncome} 
-          onRemoveIncome={handleRemoveIncome} 
-        />
-        <div style={{ marginTop: '20px' }}>
-          <Header as="h5">Netto Inntekt</Header>
-          <p>{netIncome}</p>
-        </div>
-        <ExpenseForm
-          expenses={expenses}
-          onExpenseChange={handleExpenseChange}
-          onAddExpense={handleAddExpense}
-          onRemoveExpense={handleRemoveExpense}
-        />
-        <div style={{ display: 'flex', marginBottom: '3rem', marginTop: '3rem'}}>
-            <div style={{ marginTop: '20px', paddingRight: '1rem' }}>
-              <Header as="h3">Totalt Inntekt</Header>
-              <p>{totalIncome}</p>
-            </div>
-            <div style={{ marginTop: '20px', paddingLeft: '1rem', paddingRight: '1rem' }}>
-              <Header as="h3">Totalt Utgift</Header>
-              <p>{totalExpense}</p>
-            </div>
-            <div style={{ marginTop: '20px', paddingLeft: '1rem' }}>
-              <Header as="h3">Sum Penger Igjen</Header>
-              <p>{remainingAmount}</p>
-            </div>
-        </div>
-        <Button type="submit" primary>Få Oversikt</Button>
       </Form>
-    </Container>
-  );
-};
+    </Segment>
 
-export default BudgetForm;
+    <Segment>
+      <Header as="h3">
+        <Icon name="arrow up" />
+        <Header.Content>Inntekter</Header.Content>
+      </Header>
+      <IncomeForm
+        incomes={budget.incomes}
+        onIncomeChange={handleIncomeChange}
+        onAddIncome={handleAddIncome}
+        onRemoveIncome={handleRemoveIncome}
+      />
+    </Segment>
+
+    <Segment>
+      <Header as="h3">
+        <Icon name="arrow down" />
+        <Header.Content>Utgifter</Header.Content>
+      </Header>
+      <ExpenseForm
+        expenses={budget.expenses}
+        onExpenseChange={handleExpenseChange}
+        onAddExpense={handleAddExpense}
+        onRemoveExpense={handleRemoveExpense}
+      />
+    </Segment>
+
+    <Button type="submit" primary>Få Oversikt</Button>
+    <Button type='button' onClick={closeForm}>Avbryt</Button>
+  </Container>
+  );
+}

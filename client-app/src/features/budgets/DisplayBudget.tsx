@@ -1,45 +1,39 @@
-import { useEffect, useState } from "react";
+// DisplayBudget.tsx
+import { Card, Button } from "semantic-ui-react";
+import { Budget } from "../../app/models/budget";
 import { Link } from "react-router-dom";
-import { Container, Card } from "semantic-ui-react";
-import axios, { AxiosResponse } from "axios";
 
-interface Budget {
-    id: string;
-    name: string;
-    totalNetIncome: number;
-    totalExpense: number;
+interface Props {
+   budgets: Budget[];
+   selectBudget: (id: string) => void;
+   deleteBudget: (id: string) => void;
 }
 
-function DisplayBudget() {
-    const [budgets, setBudgets] = useState<Budget[]>([]);
-
-    useEffect(() => {
-        axios.get('http://localhost:5000/api/budget')
-            .then((response: AxiosResponse<Budget[]>) => {
-                setBudgets(response.data);
-                console.log(response.data);
-            })            
-            .catch((error) => {
-                console.error('Error fetching budgets:', error);
-            });
-    }, []);
+function DisplayBudget({ budgets, selectBudget, deleteBudget }: Props) {
 
     return (
-        <Container style={{ marginTop: '8rem' }}>
-            <h1>Mine Budsjetter</h1>
-            <Card.Group>
-                {budgets.map((budget: Budget) => (
-                    <Card
-                        as={Link}
-                        to={`/budgets/${budget.id}`}
-                        key={budget.id}
-                        header={budget.name}
-                        meta={`Total Net Income: ${budget.totalNetIncome}`}
-                        description={`Total Expenses: ${budget.totalExpense}`}
-                    />
-                ))}
-            </Card.Group>
-        </Container>
+        <Card.Group>
+            {budgets.map((budget: Budget) => (
+                <Card key={budget.id}>
+                    <Card.Content>
+                        <Card.Header>{budget.name}</Card.Header>
+                        <Card.Meta>Total Net Income: {budget.totalNetIncome}</Card.Meta>
+                        <Card.Description>Total Expenses: {budget.totalExpense}</Card.Description>
+                    </Card.Content>
+                    <Card.Content extra>
+                        <div className='ui two buttons'>
+                        <Button basic color='blue' onClick={() => { selectBudget(budget.id); }}>
+                            <Link to={`/budget/${budget.id}`}>
+                                Åpne
+                            </Link>
+                        </Button>
+
+                        <Button onClick={() => deleteBudget(budget.id)} basic color='red'>Slett</Button>
+                        </div>
+                    </Card.Content>
+                </Card>
+            ))}
+        </Card.Group>
     );
 }
 

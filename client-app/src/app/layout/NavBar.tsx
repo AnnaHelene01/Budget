@@ -38,11 +38,8 @@ const NavBar = ({ fixed }: NavBarProps) => {
           </Menu.Item>
           {windowWidth > 768 && (
             <>
-              <Menu.Item as={Link} to='/budgets' active={location.pathname === '/budgets'}>
+              <Menu.Item as={Link} to='/budget' active={location.pathname === '/budget'}>
                 Budsjett
-              </Menu.Item>
-              <Menu.Item as={Link} to='/profile' active={location.pathname === '/profile'}>
-                Min Profil
               </Menu.Item>
               <Menu.Item as={Link} to='/about' active={location.pathname === '/about'}>
                 Om Oss
@@ -70,11 +67,8 @@ const NavBar = ({ fixed }: NavBarProps) => {
           <Menu.Item as={Link} to='/' active={location.pathname === '/'}>
             Hjem
           </Menu.Item>
-          <Menu.Item as={Link} to='/budgets' active={location.pathname === '/budgets'}>
+          <Menu.Item as={Link} to='/budget' active={location.pathname === '/budget'}>
             Budsjett
-          </Menu.Item>
-          <Menu.Item as={Link} to='/profile' active={location.pathname === '/profile'}>
-            Min Profil
           </Menu.Item>
           <Menu.Item as={Link} to='/about' active={location.pathname === '/about'}>
             Om oss

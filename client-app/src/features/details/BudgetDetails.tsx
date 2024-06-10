@@ -1,37 +1,16 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import axios, { AxiosResponse } from "axios";
-import { Container, Header, Segment, Table, Icon, Button, } from "semantic-ui-react";
+import { Button, Container, Header, Icon, Segment, Table } from "semantic-ui-react";
+import { Budget } from "../../app/models/budget"
 
-interface Budget {
-    id: string;
-    name: string;
-    totalNetIncome: number;
-    totalExpense: number;
-    incomes: { id: string, source: string, grossAmount: number, netAmount: number, taxPercentage: number }[];
-    expenses: { id: string, category: string, subcategory: string, description: string, amount: number }[];
+interface Props {
+    budget: Budget
+    cancelSelectBudget: () => void;
+    openForm: (id: string) => void;
 }
 
-function BudgetDetails() {
-    const { id } = useParams<{ id: string }>();
-    const [budget, setBudget] = useState<Budget | null>(null);
-
-    useEffect(() => {
-        axios.get(`http://localhost:5000/api/budget/${id}`)
-            .then((response: AxiosResponse<Budget>) => {
-                setBudget(response.data);
-                console.log(response.data);
-            })
-            .catch((error) => {
-                console.error('Error fetching budget details:', error);
-            });
-    }, [id]);
-
-    if (!budget) {
-        return <div>Loading...</div>;
-    }
+export default function BudgetDetails ({ budget, cancelSelectBudget, openForm }:Props) {
 
     return (
+    <>
         <Container style={{ marginTop: '8rem' }}>
             <Header as="h1">{budget.name}</Header>
             
@@ -109,15 +88,15 @@ function BudgetDetails() {
             </Segment>
 
             <Segment>
-                <Button primary>
+                <Button primary onClick={() => openForm(budget.id)}>
                     <Icon name="edit" /> Rediger
                 </Button>
-                <Button negative>
+                <Button negative onClick={cancelSelectBudget}>
                     <Icon name="trash" /> Slett
                 </Button>
             </Segment>
         </Container>
+    </>
     );
 }
 
-export default BudgetDetails;

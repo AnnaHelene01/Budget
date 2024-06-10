@@ -1,9 +1,13 @@
+//ContentSection.tsx
 import { Container, Header, Image, Grid, Segment } from 'semantic-ui-react';
-import BudgetForm from '../../app/form/BudgetForm';
 import HeaderImg from '../../../public/assets/image.png';
 
-const ContentSection = () => (
-  <Segment style={{ padding: '8em 0em' }} vertical>
+const ContentSection = () => {
+
+
+  return (
+    <>
+     <Segment style={{ padding: '8em 0em' }} vertical>
     <Container>
       <Grid stackable>
         <Grid.Row>
@@ -13,7 +17,7 @@ const ContentSection = () => (
             </Header>
             <p style={{ fontSize: '1.33em' }}>
             Med ØkonomiPilot kan du enkelt få full kontroll over din personlige økonomi. 
-            Logg inn, legg inn dine inntekter og utgifter, og lag skreddersydde budsjetter 
+            Logg inn, legg inn dine inntekter og utgifter, og lag skreddersydde budsjett 
             som hjelper deg å nå dine økonomiske mål. Alle dataene dine er trygt lagret 
             og kun tilgjengelig for deg. 
             Start din reise mot økonomisk frihet med ØkonomiPilot i dag!
@@ -24,7 +28,7 @@ const ContentSection = () => (
             <p style={{ fontSize: '1.33em' }}>
             ØkonomiPilot gir deg en enkel og brukervennlig plattform hvor du kan holde oversikt 
             over alle dine økonomiske transaksjoner. Når du registrerer dine inntekter 
-            og utgifter, vil verktøyet automatisk oppdatere dine budsjetter og gi deg en 
+            og utgifter, vil verktøyet automatisk oppdatere dine budsjett og gi deg en 
             tydelig oversikt over din økonomiske situasjon. 
             Med ØkonomiPilot får du detaljert innsikt i dine forbruksvaner, noe som gjør 
             det enklere å ta smarte økonomiske beslutninger.
@@ -36,8 +40,10 @@ const ContentSection = () => (
         </Grid.Row>
       </Grid>
     </Container>
-    <BudgetForm />
   </Segment>
-);
+    </>
+  )
+ 
+};
 
 export default ContentSection;

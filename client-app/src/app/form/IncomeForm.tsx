@@ -1,9 +1,10 @@
 import React from 'react';
 import { Form, Header, Button, Icon } from 'semantic-ui-react';
+import { Income } from '../models/budget';
 
 interface IncomeFormProps {
-  incomes: Array<{ source: string, grossAmount: number, taxPercentage: number }>;
-  onIncomeChange: (index: number, income: any) => void;
+  incomes: Income[];
+  onIncomeChange: (index: number, income: Income) => void;
   onAddIncome: () => void;
   onRemoveIncome: (index: number) => void;
 }
