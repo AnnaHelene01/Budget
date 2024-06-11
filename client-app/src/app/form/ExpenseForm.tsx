@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Header, Dropdown, DropdownProps } from 'semantic-ui-react';
+import { Form, Button, Header, Dropdown, DropdownProps, Grid, Icon } from 'semantic-ui-react';
 import { Expense } from '../models/budget';
 import { categoryOptions, updateSubcategoryOptions } from './CategoryOptions';
 
@@ -11,7 +11,6 @@ interface ExpenseFormProps {
 }
 
 const ExpenseForm: React.FC<ExpenseFormProps> = ({ onExpenseChange, onAddExpense, onRemoveExpense, expenses }) => {
-  const [subcategoryOptions, setSubcategoryOptions] = useState<any[]>([]);
   const [individualSubcategories, setIndividualSubcategories] = useState<{ [key: number]: any[] }>({});
   const [totalExpense, setTotalExpense] = useState<number>(0);
 
@@ -21,15 +20,10 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onExpenseChange, onAddExpense
 
   const handleExpenseChange = (index: number, name: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    let parsedValue: string | number = value;
-    if (name === 'amount') {
-      parsedValue = parseFloat(value);
-    }
-    if (!isNaN(parsedValue as number)) {
-      const updatedExpense = { ...expenses[index], [name]: parsedValue };
-      onExpenseChange(index, updatedExpense);
-      recalculateTotalExpense();
-    }
+    const parsedValue = name === 'amount' ? parseFloat(value) : value; // Parse only amount as number
+    const updatedExpense = { ...expenses[index], [name]: parsedValue };
+    onExpenseChange(index, updatedExpense);
+    recalculateTotalExpense();
   };
 
   const handleCategoryChange = (index: number, value: string) => {
@@ -56,65 +50,78 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onExpenseChange, onAddExpense
   return (
     <>
       <Header as="h3">Utgifter</Header>
-      {expenses.map((expense, index) => (
-        <Form.Group key={index}>
-          <Form.Field width={4}>
-            <label>Kategori</label>
-            <Dropdown
-              selection
-              fluid
-              options={categoryOptions}
-              value={expense.category}
-              onChange={(_e, data: DropdownProps) => handleCategoryChange(index, data.value as string)}
-              placeholder='Velg kategori'
-              search
-              allowAdditions
-              additionLabel='Legg til'
-            />
-          </Form.Field>
-          <Form.Field width={4}>
-            <label>Underkategori</label>
-            <Dropdown
-              selection
-              fluid
-              options={individualSubcategories[index] || subcategoryOptions}
-              value={expense.subcategory}
-              onChange={(_e, data: DropdownProps) => handleSubcategoryChange(index, data.value as string)}
-              placeholder='Velg underkategori'
-              search
-              allowAdditions
-              additionLabel='Legg til'
-            />
-          </Form.Field>
-          <Form.Field width={4}>
-            <label>Beskrivelse</label>
-            <input
-              type="text"
-              name="description"
-              placeholder="Valgfri beskrivelse"
-              value={expense.description}
-              onChange={handleExpenseChange(index, 'description')}
-            />
-          </Form.Field>
-          <Form.Field width={4}>
-            <label>Beløp</label>
-            <input
-              type="number"
-              name="amount"
-              placeholder="Enter expense amount"
-              value={expense.amount}
-              onChange={handleExpenseChange(index, 'amount')}
-            />
-          </Form.Field>
-          <Button type="button" onClick={() => onRemoveExpense(index)}>Fjern</Button>
-        </Form.Group>
-      ))}
-
-      <Button type="button" onClick={onAddExpense}>Legg til utgift</Button>
-      <div style={{ marginTop: '20px' }}>
-        <Header as="h5">SUM - Utgifter</Header>
-        <p>{totalExpense}</p>
-      </div>
+      <Grid columns={5} stackable>
+        {expenses.map((expense, index) => (
+          <Grid.Row key={index}>
+            <Grid.Column>
+              <Form.Field>
+                <label>Kategori</label>
+                <Dropdown
+                  selection
+                  fluid
+                  options={categoryOptions}
+                  value={expense.category}
+                  onChange={(_e, data: DropdownProps) => handleCategoryChange(index, data.value as string)}
+                  placeholder="Velg kategori"
+                  search
+                  allowAdditions
+                  additionLabel="Legg til"
+                />
+              </Form.Field>
+            </Grid.Column>
+            <Grid.Column>
+              <Form.Field>
+                <label>Underkategori</label>
+                <Dropdown
+                  selection
+                  fluid
+                  options={individualSubcategories[index] || []}
+                  value={expense.subcategory}
+                  onChange={(_e, data: DropdownProps) => handleSubcategoryChange(index, data.value as string)}
+                  placeholder="Velg underkategori"
+                  search
+                  allowAdditions
+                  additionLabel="Legg til"
+                />
+              </Form.Field>
+            </Grid.Column>
+            <Grid.Column>
+              <Form.Field>
+                <label>Beskrivelse</label>
+                <input
+                  type="text"
+                  placeholder="Enter description"
+                  value={expense.description}
+                  onChange={handleExpenseChange(index, 'description')}
+                />
+              </Form.Field>
+            </Grid.Column>
+            <Grid.Column>
+              <Form.Field>
+                <label>Beløp</label>
+                <input
+                  type="number"
+                  placeholder="Enter amount"
+                  value={expense.amount}
+                  onChange={handleExpenseChange(index, 'amount')}
+                />
+              </Form.Field>
+            </Grid.Column>
+            <Grid.Column verticalAlign="middle">
+              <Button icon color="red" onClick={() => onRemoveExpense(index)}>
+                <Icon name="trash" />
+              </Button>
+            </Grid.Column>
+          </Grid.Row>
+        ))}
+      </Grid>
+      <Button onClick={onAddExpense} type="button" color="green" icon style={{ marginTop: '20px' }}>
+        <Icon name="plus" />
+        Legg til utgift
+      </Button>
+      <p style={{ marginTop: '20px' }}>
+        Total utgift: <strong>{totalExpense}</strong>
+      </p>
     </>
   );
 };

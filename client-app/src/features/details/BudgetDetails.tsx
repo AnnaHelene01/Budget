@@ -4,10 +4,9 @@ import { Budget } from "../../app/models/budget"
 interface Props {
     budget: Budget
     cancelSelectBudget: () => void;
-    openForm: (id: string) => void;
 }
 
-export default function BudgetDetails ({ budget, cancelSelectBudget, openForm }:Props) {
+export default function BudgetDetails ({ budget, cancelSelectBudget }:Props) {
 
     return (
     <>
@@ -88,7 +87,7 @@ export default function BudgetDetails ({ budget, cancelSelectBudget, openForm }:
             </Segment>
 
             <Segment>
-                <Button primary onClick={() => openForm(budget.id)}>
+                <Button primary >
                     <Icon name="edit" /> Rediger
                 </Button>
                 <Button negative onClick={cancelSelectBudget}>

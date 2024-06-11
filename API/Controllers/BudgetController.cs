@@ -45,7 +45,7 @@ namespace API.Controllers
             return Ok(budget);
         }
 
-        [HttpPost] //api/budget
+        [HttpPost] 
         public async Task<IActionResult> CreateBudget(Budget budget)
         {
             _context.Budgets.Add(budget);

@@ -32,7 +32,7 @@ const requests = {
 const Budgets = {
     list: () => requests.get<Budget[]>(`/budget`),
     details: (id: string) => requests.get<Budget>(`/budget/${id}`),
-    create: (budget: Budget) => requests.post<void>(`/`, budget),
+    create: (budget: Budget) => requests.post<void>(`/budget`, budget),
     update: (budget: Budget) => requests.put<void>(`/budget/edit/${budget.id}`, budget),
     delete: (id: string) => requests.del<void>(`/budget/${id}`)
 }

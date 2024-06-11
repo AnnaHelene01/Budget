@@ -10,7 +10,7 @@ interface NavBarProps {
 const NavBar = ({ fixed }: NavBarProps) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [showSidebar, setShowSidebar] = useState(windowWidth <= 768);
-  const location = useLocation(); // Få den nåværende stien
+  const location = useLocation();
 
   useEffect(() => {
     const handleResize = () => {
@@ -39,7 +39,7 @@ const NavBar = ({ fixed }: NavBarProps) => {
           {windowWidth > 768 && (
             <>
               <Menu.Item as={Link} to='/budget' active={location.pathname === '/budget'}>
-                Budsjett
+                Mine Budsjett
               </Menu.Item>
               <Menu.Item as={Link} to='/about' active={location.pathname === '/about'}>
                 Om Oss

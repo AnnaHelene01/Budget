@@ -15,15 +15,40 @@ export default class BudgetStore {
     }
 
     loadBudgets = async () => {
+        this.setLoadingInitial(true);
         try {
-             const budgets = await agent.Budgets.list();
-             budgets.forEach((budget: Budget) => {
-                this.budgetRegistry.set(budget.id, budget);
-             })
-            this.setLoadingInitial(false);
+            const budgets = await agent.Budgets.list();
+            runInAction(() => {
+                budgets.forEach((budget: Budget) => {
+                    this.budgetRegistry.set(budget.id, budget);
+                });
+                this.setLoadingInitial(false);
+            });
         } catch (error) {
             console.log(error);
             this.setLoadingInitial(false);
+        }
+    }
+
+    loadBudget = async (id: string) => {
+        let budget = this.getBudget(id);
+        if (budget) {
+            this.selectedBudget = budget;
+            return budget;
+        } else {
+            this.setLoadingInitial(true);
+            try {
+                budget = await agent.Budgets.details(id);
+                runInAction(() => {
+                    this.setBudget(budget!);
+                    this.selectedBudget = budget;
+                    this.setLoadingInitial(false);
+                });
+                return budget;
+            } catch (error) {
+                console.log(error);
+                this.setLoadingInitial(false);
+            }
         }
     }
 
@@ -39,19 +64,26 @@ export default class BudgetStore {
         this.selectedBudget = undefined;
     }
 
+    private setBudget = (budget: Budget) => {
+        this.budgetRegistry.set(budget.id, budget);
+    }
+
+    private getBudget = (id: string) => {
+        return this.budgetRegistry.get(id);
+    }
 
     createBudget = async (budget: Budget) => {
         this.loading = true;
         budget.id = uuid();
+        console.log('Generated ID:', budget.id);
         try {
             await agent.Budgets.create(budget);
             runInAction(() => {
-                this.budgetRegistry.set(budget.id, budget)
+                this.budgetRegistry.set(budget.id, budget);
                 this.selectedBudget = budget;
                 this.editMode = false;
                 this.loading = false;
-            })
-            
+            });
         } catch (error) {
             console.log(error);
             runInAction(() => this.loading = false);
@@ -61,14 +93,13 @@ export default class BudgetStore {
     updateBudget = async (budget: Budget) => {
         this.loading = true;
         try {
-            await agent.Budgets.update(budget)
+            await agent.Budgets.update(budget);
             runInAction(() => {
-                this.budgetRegistry.set(budget.id, budget)
+                this.budgetRegistry.set(budget.id, budget);
                 this.selectedBudget = budget;
                 this.editMode = false;
                 this.loading = false;
-            })
-            
+            });
         } catch (error) {
             console.log(error);
             runInAction(() => this.loading = false);
@@ -82,11 +113,10 @@ export default class BudgetStore {
             runInAction(() => {
                 this.budgetRegistry.delete(id);
                 this.loading = false;
-            })
+            });
         } catch (error) {
             console.log(error);
             runInAction(() => this.loading = false);
         }
     }
 }
-
