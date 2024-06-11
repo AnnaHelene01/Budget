@@ -3,11 +3,7 @@ import { Menu, Container, Button, Icon } from 'semantic-ui-react';
 import { Link, useLocation } from 'react-router-dom';
 import '../../App.css';
 
-interface NavBarProps {
-  fixed: "right" | "left" | "top" | "bottom" | null;
-}
-
-const NavBar = ({ fixed }: NavBarProps) => {
+const NavBar = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [showSidebar, setShowSidebar] = useState(windowWidth <= 768);
   const location = useLocation();
@@ -31,7 +27,7 @@ const NavBar = ({ fixed }: NavBarProps) => {
 
   return (
     <>
-      <Menu fixed={fixed || undefined} className="navbar">
+      <Menu className="navbar">
         <Container>
           <Menu.Item as={Link} to='/' active={location.pathname === '/'}>
             Hjem
@@ -49,10 +45,10 @@ const NavBar = ({ fixed }: NavBarProps) => {
           <Menu.Item position='right'>
             {windowWidth > 768 ? (
               <>
-                <Button as={Link} to="/login" inverted={!fixed}>
+                <Button as={Link} to="/login" inverted>
                   Logg inn
                 </Button>
-                <Button as={Link} to="/register" inverted={!fixed} primary={fixed !== null} style={{ marginLeft: '0.5em' }}>
+                <Button as={Link} to="/register" inverted primary style={{ marginLeft: '0.5em' }}>
                   Registrer
                 </Button>
               </>

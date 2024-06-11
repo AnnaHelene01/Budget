@@ -1,12 +1,21 @@
 import { Button, Container, Header, Icon, Segment, Table } from "semantic-ui-react";
-import { Budget } from "../../app/models/budget"
+import { observer } from "mobx-react-lite";
+import { useStore } from "../../app/stores/store";
+import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import LoadingComponent from "../../app/layout/LoadingComponent";
 
-interface Props {
-    budget: Budget
-    cancelSelectBudget: () => void;
-}
+export default observer(function BudgetDetails () {
 
-export default function BudgetDetails ({ budget, cancelSelectBudget }:Props) {
+    const { budgetStore } = useStore();
+    const { selectedBudget: budget, loadBudget, loadingInitial } = budgetStore;
+    const { id } = useParams();
+
+    useEffect(() => {
+        if (id) loadBudget(id);
+    }, [id, loadBudget])
+
+    if (loadingInitial || !budget) return <LoadingComponent />
 
     return (
     <>
@@ -90,12 +99,12 @@ export default function BudgetDetails ({ budget, cancelSelectBudget }:Props) {
                 <Button primary >
                     <Icon name="edit" /> Rediger
                 </Button>
-                <Button negative onClick={cancelSelectBudget}>
+                <Button negative>
                     <Icon name="trash" /> Slett
                 </Button>
             </Segment>
         </Container>
     </>
     );
-}
+});
 

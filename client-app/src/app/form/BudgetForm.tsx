@@ -185,7 +185,7 @@ export default observer(function BudgetForm() {
           />
         </Segment>
 
-        <Button type="submit" primary>Få Oversikt</Button>
+        <Button type="submit" primary >Få Oversikt</Button>
         <Button type='button' onClick={() => navigate('/budgets')}>Avbryt</Button>
       </Form>
     </Container>
