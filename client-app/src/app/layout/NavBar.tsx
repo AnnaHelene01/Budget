@@ -43,6 +43,9 @@ const NavBar = () => {
               <Menu.Item as={Link} to='/about' active={location.pathname === '/about'}>
                 Om Oss
               </Menu.Item>
+              <Menu.Item as={Link} to='/errors' active={location.pathname === '/errors'}>
+                Errors
+              </Menu.Item>
             </>
           )}
           <Menu.Item position='right'>

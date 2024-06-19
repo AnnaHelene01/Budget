@@ -1,3 +1,4 @@
+using Application.Core;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -6,12 +7,12 @@ namespace Application.Budgets
 {
     public class Delete
     {
-        public class Command : IRequest
+        public class Command : IRequest<Result<Unit>>
         {
             public Guid Id { get; set; }
         }
 
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command, Result<Unit>>
         {
             private readonly BudgetContext _context;
 
@@ -20,27 +21,15 @@ namespace Application.Budgets
                 _context = context;
             }
 
-            public async Task Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var budget = await _context.Budgets
-                    .Include(b => b.Incomes)
-                    .Include(b => b.Expenses)
-                    .FirstOrDefaultAsync(b => b.Id == request.Id);
+                var budget = await _context.Budgets.FindAsync(request.Id);
+                if (budget == null) return null;
+                _context.Remove(budget);
 
-                if (budget == null)
-                {
-                    throw new Exception("Budget not found");
-                }
-
-                // Slett tilknyttede inntekter og utgifter
-                _context.Incomes.RemoveRange(budget.Incomes);
-                _context.Expenses.RemoveRange(budget.Expenses);
-
-                // Slett budsjettet
-                _context.Budgets.Remove(budget);
-
-                await _context.SaveChangesAsync();
-
+                var result = await _context.SaveChangesAsync() > 0;
+                if (!result) return Result<Unit>.Failure("Failed to delete the activity");
+                return Result<Unit>.Success(Unit.Value);
             }
         }
     }

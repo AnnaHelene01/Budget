@@ -1,71 +1,41 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Application.Budgets;
 using Domain;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Persistence;
+
 
 namespace API.Controllers
 {
     public class BudgetController : BaseApiController
     {
-        private readonly BudgetContext _context;
-         private readonly IMediator _mediator;
-
-
-        public BudgetController(BudgetContext context, IMediator mediator)
+        [HttpGet] //api/budget
+        public async Task<IActionResult> GetBudgets(CancellationToken ct)
         {
-            _context = context;
-            _mediator = mediator;
-
+            return HandleResult(await Mediator.Send(new List.Query(), ct));
         }
 
-        [HttpGet] //api/budget
-        public async Task<ActionResult<List<Budget>>> GetBudgets(CancellationToken ct)
+        private IActionResult HandleResult(object value)
         {
-            var budgets = await _context.Budgets
-                .Include(b => b.Incomes)
-                .Include(b => b.Expenses)
-                .ToListAsync(ct);
-
-            return Ok(budgets);
+            throw new NotImplementedException();
         }
 
         [HttpGet("{id}")] //api/budget/{id}
-        public async Task<ActionResult<Budget>> GetBudget(Guid id)
+        public async Task<IActionResult> GetBudget(Guid id)
         {
-            var budget = await _context.Budgets
-                .Include(b => b.Incomes)
-                .Include(b => b.Expenses)
-                .FirstOrDefaultAsync(b => b.Id == id);
-
-            if (budget == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(budget);
+           return HandleResult(await Mediator.Send(new Details.Query{Id = id}));
         }
 
-        [HttpPost] 
-        public async Task<IActionResult> CreateBudget(Budget budget)
+        [HttpPost]
+        public async Task<IActionResult> CreateBudget([FromBody] Budget budget)
         {
-            _context.Budgets.Add(budget);
-            await _context.SaveChangesAsync();
-            return Ok();
+            return HandleResult(await Mediator.Send(new Create.Command { Budget = budget }));
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Edit(Guid id, Budget budget)
         {
             budget.Id = id;
-            await Mediator.Send(new Edit.Command { Budget = budget });
-            return Ok();
+            return HandleResult(await Mediator.Send(new Edit.Command { Budget = budget }));
         }
-
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
