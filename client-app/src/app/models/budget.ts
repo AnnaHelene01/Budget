@@ -3,6 +3,8 @@ export interface Budget {
     name: string;
     totalNetIncome: number;
     totalExpense: number;
+    totalGrossIncome: number;
+    netAmount: number;
     incomes: Income[];
     expenses: Expense[];
 }

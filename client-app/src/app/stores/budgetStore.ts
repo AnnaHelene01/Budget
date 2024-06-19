@@ -75,36 +75,39 @@ export default class BudgetStore {
     createBudget = async (budget: Budget) => {
         this.loading = true;
         budget.id = uuid();
-        console.log('Generated ID:', budget.id);
         try {
-            await agent.Budgets.create(budget);
-            runInAction(() => {
-                this.budgetRegistry.set(budget.id, budget);
-                this.selectedBudget = budget;
-                this.editMode = false;
-                this.loading = false;
-            });
+          await agent.Budgets.create(budget);
+          runInAction(() => {
+            this.budgetRegistry.set(budget.id, budget);
+            this.selectedBudget = budget;
+            this.editMode = false;
+            this.loading = false;
+          });
         } catch (error) {
-            console.log(error);
-            runInAction(() => this.loading = false);
+          console.log(error);
+          runInAction(() => this.loading = false);
         }
-    }
-
+      }
+      
     updateBudget = async (budget: Budget) => {
         this.loading = true;
         try {
-            await agent.Budgets.update(budget);
-            runInAction(() => {
-                this.budgetRegistry.set(budget.id, budget);
-                this.selectedBudget = budget;
-                this.editMode = false;
-                this.loading = false;
-            });
+          await agent.Budgets.update(budget);
+          runInAction(() => {
+            this.budgetRegistry.set(budget.id, budget);
+            this.selectedBudget = budget;
+            this.editMode = false;
+            this.loading = false;
+          })
         } catch (error) {
-            console.log(error);
-            runInAction(() => this.loading = false);
+          console.log("UpdateError", error);
+          runInAction(() => {
+            this.loading = false;
+          })
         }
-    }
+      }
+    
+    
 
     deleteBudget = async (id: string) => {
         this.loading = true;

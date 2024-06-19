@@ -34,7 +34,10 @@ const NavBar = () => {
           </Menu.Item>
           {windowWidth > 768 && (
             <>
-              <Menu.Item as={Link} to='/budget' active={location.pathname === '/budget'}>
+               <Menu.Item as={Link} to='/createBudget' active={location.pathname === '/creatBudget'}>
+                Lag Budsjett
+              </Menu.Item>
+              <Menu.Item as={Link} to='/budget' active={location.pathname === '/budgt'}>
                 Mine Budsjett
               </Menu.Item>
               <Menu.Item as={Link} to='/about' active={location.pathname === '/about'}>
@@ -63,8 +66,11 @@ const NavBar = () => {
           <Menu.Item as={Link} to='/' active={location.pathname === '/'}>
             Hjem
           </Menu.Item>
+          <Menu.Item as={Link} to='/createBudget' active={location.pathname === '/creatBudget'}>
+                Lag Budsjett
+              </Menu.Item>
           <Menu.Item as={Link} to='/budget' active={location.pathname === '/budget'}>
-            Budsjett
+            Mine Budsjett
           </Menu.Item>
           <Menu.Item as={Link} to='/about' active={location.pathname === '/about'}>
             Om oss

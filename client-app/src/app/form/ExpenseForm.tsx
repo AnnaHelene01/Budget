@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Header, Dropdown, DropdownProps, Grid, Icon } from 'semantic-ui-react';
+import { Form, Button, Dropdown, DropdownProps, Grid, Icon } from 'semantic-ui-react';
 import { Expense } from '../models/budget';
 import { categoryOptions, updateSubcategoryOptions } from './CategoryOptions';
+import { observer } from 'mobx-react-lite';
 
 interface ExpenseFormProps {
   onExpenseChange: (index: number, expense: Expense) => void;
-  onAddExpense: () => void;
   onRemoveExpense: (index: number) => void;
   expenses: Expense[];
+  isEditMode: boolean;
 }
 
-const ExpenseForm: React.FC<ExpenseFormProps> = ({ onExpenseChange, onAddExpense, onRemoveExpense, expenses }) => {
+const ExpenseForm: React.FC<ExpenseFormProps> = ({ onExpenseChange, onRemoveExpense, expenses }) => {
   const [individualSubcategories, setIndividualSubcategories] = useState<{ [key: number]: any[] }>({});
   const [totalExpense, setTotalExpense] = useState<number>(0);
 
@@ -18,16 +19,16 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onExpenseChange, onAddExpense
     recalculateTotalExpense();
   }, [expenses]);
 
-  const handleExpenseChange = (index: number, name: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleExpenseChange = (index: number, name: keyof Expense) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    const parsedValue = name === 'amount' ? parseFloat(value) : value; // Parse only amount as number
+    const parsedValue = name === 'amount' ? parseFloat(value) : value;
     const updatedExpense = { ...expenses[index], [name]: parsedValue };
     onExpenseChange(index, updatedExpense);
     recalculateTotalExpense();
   };
 
   const handleCategoryChange = (index: number, value: string) => {
-    const updatedExpense = { ...expenses[index], category: value };
+    const updatedExpense = { ...expenses[index], category: value, subcategory: '' };
     onExpenseChange(index, updatedExpense);
     const subcategoryOptions = updateSubcategoryOptions(value);
     setIndividualSubcategories((prev) => ({ ...prev, [index]: subcategoryOptions }));
@@ -36,10 +37,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onExpenseChange, onAddExpense
   const handleSubcategoryChange = (index: number, value: string) => {
     const updatedExpense = { ...expenses[index], subcategory: value };
     onExpenseChange(index, updatedExpense);
-    setIndividualSubcategories((prev) => ({
-      ...prev,
-      [index]: updateSubcategoryOptions(expenses[index].category),
-    }));
   };
 
   const recalculateTotalExpense = () => {
@@ -49,7 +46,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onExpenseChange, onAddExpense
 
   return (
     <>
-      <Header as="h3">Utgifter</Header>
       <Grid columns={5} stackable>
         {expenses.map((expense, index) => (
           <Grid.Row key={index}>
@@ -115,10 +111,6 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onExpenseChange, onAddExpense
           </Grid.Row>
         ))}
       </Grid>
-      <Button onClick={onAddExpense} type="button" color="green" icon style={{ marginTop: '20px' }}>
-        <Icon name="plus" />
-        Legg til utgift
-      </Button>
       <p style={{ marginTop: '20px' }}>
         Total utgift: <strong>{totalExpense}</strong>
       </p>
@@ -126,4 +118,4 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onExpenseChange, onAddExpense
   );
 };
 
-export default ExpenseForm;
+export default observer(ExpenseForm);

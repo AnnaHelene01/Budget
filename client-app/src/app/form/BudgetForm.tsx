@@ -1,4 +1,4 @@
-import { useState, useEffect, ChangeEvent } from 'react';
+import { useEffect, useState, ChangeEvent } from 'react';
 import { Button, Container, Form, Header, Icon, Segment } from 'semantic-ui-react';
 import { Budget, Expense, Income } from '../models/budget';
 import IncomeForm from './IncomeForm';
@@ -18,71 +18,57 @@ export default observer(function BudgetForm() {
   const [budget, setBudget] = useState<Budget>({
     id: '',
     name: '',
+    totalGrossIncome: 0,
     totalNetIncome: 0,
     totalExpense: 0,
+    netAmount: 0,
     incomes: [],
     expenses: []
   });
 
+  const isEditMode = !!id;
+
   useEffect(() => {
-    if (id) loadBudget(id).then(budget => setBudget(budget!));
+    if (id) {
+      loadBudget(id).then(budget => {
+        if (budget) {
+          setBudget(budget);
+        }
+      });
+    }
   }, [id, loadBudget]);
 
+  useEffect(() => {
+    const totalGrossIncome = budget.incomes.reduce((total, income) => total + income.grossAmount, 0);
+    const totalNetIncome = budget.incomes.reduce((total, income) => total + income.netAmount, 0);
+    const totalExpense = budget.expenses.reduce((total, expense) => total + expense.amount, 0);
+
+    setBudget(prev => ({
+      ...prev,
+      totalGrossIncome,
+      totalNetIncome,
+      totalExpense
+    }));
+  }, [budget.incomes, budget.expenses]);
+
   function handleSubmit() {
-    // Validering av inntekter og utgifter
-    if (budget.incomes.some(income => !income.source || income.grossAmount <= 0 || income.taxPercentage < 0)) {
-      console.error('Invalid income data:', budget.incomes);
-      return;
-    }
-    if (budget.expenses.some(expense => !expense.description || expense.amount <= 0)) {
-      console.error('Invalid expense data:', budget.expenses);
-      return;
-    }
-
-    // Generer UUID-er for alle inntekter og utgifter som ikke har et ID
-    const updatedIncomes = budget.incomes.map(income => ({
-      ...income,
-      id: income.id || uuid()
-    }));
-
-    const updatedExpenses = budget.expenses.map(expense => ({
-      ...expense,
-      id: expense.id || uuid()
-    }));
-
-    const updatedBudget = {
+    const cleanedBudget: Budget = {
       ...budget,
-      incomes: updatedIncomes,
-      expenses: updatedExpenses
+      incomes: budget.incomes.map(income => ({ ...income })),
+      expenses: budget.expenses.map(expense => ({ ...expense }))
     };
 
-    console.log('Submitting budget:', updatedBudget); // Log dataene som sendes
-
-    if (!updatedBudget.id) {
-      updatedBudget.id = uuid();
-      createBudget(updatedBudget)
-        .then(() => navigate(`/budget/${updatedBudget.id}`))
+    if (!budget.id) {
+      cleanedBudget.id = uuid();
+      createBudget(cleanedBudget)
+        .then(() => navigate(`/budget/${cleanedBudget.id}`))
         .catch(error => console.error('Error creating budget:', error.response?.data || error.message));
     } else {
-      updateBudget(updatedBudget)
-        .then(() => navigate(`/budget/${updatedBudget.id}`))
+      updateBudget(cleanedBudget)
+        .then(() => navigate(`/budget/${cleanedBudget.id}`))
         .catch(error => console.error('Error updating budget:', error.response?.data || error.message));
     }
   }
-
-  useEffect(() => {
-    const totalExpense = budget.expenses.reduce((acc, expense) => acc + expense.amount, 0);
-    setBudget(prev => ({ ...prev, totalExpense }));
-  }, [budget.expenses]);
-
-  useEffect(() => {
-    const totalGrossIncome = budget.incomes.reduce((acc, income) => acc + income.grossAmount, 0);
-    const totalNetIncome = budget.incomes.reduce(
-      (acc, income) => acc + income.grossAmount - (income.grossAmount * income.taxPercentage) / 100,
-      0
-    );
-    setBudget(prev => ({ ...prev, totalNetIncome, totalIncome: totalGrossIncome }));
-  }, [budget.incomes]);
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = event.target;
@@ -136,7 +122,7 @@ export default observer(function BudgetForm() {
   if (loadingInitial) return <LoadingComponent content='Loading budget...' />;
 
   return (
-    <Container style={{ marginTop: '8rem', marginBottom: '8rem' }}>
+    <Container style={{ marginTop: '10em', marginBottom: '8rem' }}>
       <Header as="h2" icon textAlign="center">
         <Icon name="money bill alternate" circular />
         <Header.Content>Budsjett Skjema</Header.Content>
@@ -167,9 +153,15 @@ export default observer(function BudgetForm() {
           <IncomeForm
             incomes={budget.incomes}
             onIncomeChange={handleIncomeChange}
-            onAddIncome={handleAddIncome}
             onRemoveIncome={handleRemoveIncome}
+            isEditMode={isEditMode}
           />
+          {!isEditMode && (
+            <Button onClick={handleAddIncome} type="button" color="green" icon style={{ marginTop: '20px' }}>
+              <Icon name="plus" />
+              Legg til inntekt
+            </Button>
+          )}
         </Segment>
 
         <Segment>
@@ -180,13 +172,19 @@ export default observer(function BudgetForm() {
           <ExpenseForm
             expenses={budget.expenses}
             onExpenseChange={handleExpenseChange}
-            onAddExpense={handleAddExpense}
             onRemoveExpense={handleRemoveExpense}
+            isEditMode={isEditMode}
           />
+          {!isEditMode && (
+            <Button onClick={handleAddExpense} type="button" color="green" icon style={{ marginTop: '20px' }}>
+              <Icon name="plus" />
+              Legg til utgift
+            </Button>
+          )}
         </Segment>
 
-        <Button type="submit" primary >Få Oversikt</Button>
-        <Button type='button' onClick={() => navigate('/budgets')}>Avbryt</Button>
+        <Button type="submit" primary>Få Oversikt</Button>
+        <Button type='button' onClick={() => navigate('/budget')}>Avbryt</Button>
       </Form>
     </Container>
   );

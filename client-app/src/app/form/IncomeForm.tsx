@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Icon, Grid, Input, Form as SemanticForm } from 'semantic-ui-react';
 import { Income } from '../models/budget';
+import { observer } from 'mobx-react-lite';
 
 interface IncomeFormProps {
   incomes: Income[];
   onIncomeChange: (index: number, income: Income) => void;
-  onAddIncome: () => void;
   onRemoveIncome: (index: number) => void;
+  isEditMode: boolean;
 }
 
-const IncomeForm: React.FC<IncomeFormProps> = ({ incomes, onIncomeChange, onAddIncome, onRemoveIncome }) => {
+const IncomeForm: React.FC<IncomeFormProps> = ({ incomes, onIncomeChange, onRemoveIncome }) => {
   const [totalGrossIncome, setTotalGrossIncome] = useState<number>(0);
-  const [totalNetIncome, setTotalNetIncome] = useState<number>(0); // Legg til totalNetIncome state
+  const [totalNetIncome, setTotalNetIncome] = useState<number>(0);
 
   useEffect(() => {
     recalculateTotalIncomes();
@@ -19,7 +20,7 @@ const IncomeForm: React.FC<IncomeFormProps> = ({ incomes, onIncomeChange, onAddI
 
   const recalculateTotalIncomes = () => {
     const grossTotal = incomes.reduce((acc, income) => acc + (income.grossAmount || 0), 0);
-    const netTotal = incomes.reduce((acc, income) => acc + calculateNetAmount(income), 0);
+    const netTotal = incomes.reduce((acc, income) => acc + (income.netAmount || 0), 0);
     setTotalGrossIncome(grossTotal);
     setTotalNetIncome(netTotal);
   };
@@ -27,7 +28,17 @@ const IncomeForm: React.FC<IncomeFormProps> = ({ incomes, onIncomeChange, onAddI
   const handleIncomeChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const parsedValue = name === "grossAmount" || name === "taxPercentage" ? parseFloat(value) : value;
-    onIncomeChange(index, { ...incomes[index], [name]: parsedValue });
+
+    const updatedIncome = {
+      ...incomes[index],
+      [name]: parsedValue
+    };
+
+    if (name === "grossAmount" || name === "taxPercentage") {
+      updatedIncome.netAmount = calculateNetAmount(updatedIncome);
+    }
+
+    onIncomeChange(index, updatedIncome);
   };
 
   const calculateNetAmount = (income: Income) => {
@@ -37,7 +48,7 @@ const IncomeForm: React.FC<IncomeFormProps> = ({ incomes, onIncomeChange, onAddI
   return (
     <>
       {incomes.map((income, index) => (
-        <Grid key={index} columns={4} stackable>
+        <Grid key={index} columns={5} stackable>
           <Grid.Row>
             <Grid.Column>
               <SemanticForm.Field>
@@ -75,6 +86,18 @@ const IncomeForm: React.FC<IncomeFormProps> = ({ incomes, onIncomeChange, onAddI
                 />
               </SemanticForm.Field>
             </Grid.Column>
+            <Grid.Column>
+              <SemanticForm.Field>
+                <label>Netto i måneden</label>
+                <Input
+                  type="number"
+                  name="netAmount"
+                  placeholder="Net amount"
+                  value={income.netAmount}
+                  readOnly
+                />
+              </SemanticForm.Field>
+            </Grid.Column>
             <Grid.Column verticalAlign="middle">
               <Button icon color="red" onClick={() => onRemoveIncome(index)}>
                 <Icon name="trash" />
@@ -83,10 +106,7 @@ const IncomeForm: React.FC<IncomeFormProps> = ({ incomes, onIncomeChange, onAddI
           </Grid.Row>
         </Grid>
       ))}
-      <Button onClick={onAddIncome} type="button" color="green" icon style={{ marginTop: '20px' }}>
-        <Icon name="plus" />
-        Legg til inntekt
-      </Button>
+  
       <p style={{ marginTop: '20px' }}>
         Total Brutto Inntekt: <strong>{totalGrossIncome}</strong>
       </p>
@@ -97,4 +117,4 @@ const IncomeForm: React.FC<IncomeFormProps> = ({ incomes, onIncomeChange, onAddI
   );
 };
 
-export default IncomeForm;
+export default observer(IncomeForm);

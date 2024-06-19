@@ -1,81 +1,96 @@
 export const categoryOptions = [
-    { key: 'boligkostnader', text: 'Boligkostnader', value: 'boligkostnader' },
-    { key: 'mat_og_dagligvarer', text: 'Mat og dagligvarer', value: 'mat_og_dagligvarer' },
-    { key: 'transport', text: 'Transport', value: 'transport' },
-    { key: 'helse', text: 'Helse', value: 'helse' },
-    { key: 'personlig_utgifter', text: 'Personlig utgifter', value: 'personlig_utgifter' },
-    { key: 'underholdning', text: 'Underholdning', value: 'underholdning' },
-    { key: 'kommunale_avgifter', text: 'Kommunale avgifter', value: 'kommunale_avgifter' },
-    { key: 'utdanning', text: 'Utdanning', value: 'utdanning' },
-    { key: 'diverse', text: 'Diverse', value: 'diverse' },
-    { key: 'sparing_og_investering', text: 'Sparing og investering', value: 'sparing_og_investering' },
-  ];
-  
-  export const categorySubcategoryMap: { [key: string]: any[] } = {
-    boligkostnader: [
-        { key: 'generell', text: 'Generell', value: 'generell' },
-        { key: 'husleie', text: 'Husleie', value: 'husleie' },
-        { key: 'boliglån', text: 'Boliglån', value: 'boliglån' },
-        { key: 'strømregning', text: 'Strømregning', value: 'strømregning' },
-        { key: 'vann- og avløpsavgift', text: 'Vann- og avløpsavgift', value: 'vann- og avløpsavgift' },
-        { key: 'forsikringer (hjem, innbo osv)', text: 'Forsikringer (hjem, innbo osv)', value: 'forsikringer (hjem, innbo osv)' },
-      ],
-      mat_og_dagligvarer: [
-        { key: 'generell', text: 'Generell', value: 'generell' },
-        { key: 'matvarer', text: 'Matvarer', value: 'matvarer' },
-        { key: 'toalettsaker', text: 'Toalettsaker', value: 'toalettsaker' },
-        { key: 'husholdningsartikler', text: 'Husholdningsartikkler', value: 'husholdningsartikler' },
-      ],
-      transport: [
-        { key: 'generell', text: 'Generell', value: 'generell' },
-        { key: 'bensin/diesel', text: 'Bensin/Diesel', value: 'bensin/diesel' },
-        { key: 'bilforsikring', text: 'Bilforsikring', value: 'bilforsikring' },
-        { key: 'vedlikehold/reperasjon', text: 'Vedlikehold/reperasjon', value: 'vedlikehold/reperasjon' },
-        { key: 'offentlig transportbillett', text: 'Offentlig transportbillett', value: 'offentlig transportbillett' },
-      ],
-      helse: [
-        { key: 'generell', text: 'Generell', value: 'generell' },
-        { key: 'legetime/tannlege', text: 'Legetime- eller tannlegebesøk', value: 'legetime/tannlege' },
-        { key: 'medisin&resept', text: 'Medisiner og reseptbelagte kostnader', value: 'medisin&resept' },
-        { key: 'helseforsikring', text: 'Helseforsikring', value: 'helseforsikring' },
-      ],
-      personlig_utgifter: [
-        { key: 'generell', text: 'Generell', value: 'generell' },
-        { key: 'klær og sko', text: 'Klær og sko', value: 'klær og sko' },
-        { key: 'frisør/skjønnhetsbehandlinger', text: 'Frisør- eller skjønnhetsbehandlinger', value: 'frisør/skjønnhetsbehandlinger' },
-        { key: 'gaver', text: 'Gaver', value: 'gaver' },
-      ],
-      underholdning: [
-        { key: 'generell', text: 'Generell', value: 'generell' },
-        { key: 'kino/teater', text: 'Kino- eller teaterbilletter', value: 'kino/teater' },
-        { key: 'restauranter', text: 'Restauranter og kafeer', value: 'restauranter' },
-      ],
-      kommunale_avgifter: [
-        { key: 'generell', text: 'Generell', value: 'generell' },
-        { key: 'renovasjonsavgift', text: 'Renovasjonsavgift', value: 'renovasjonsavgift' },
-        { key: 'eiendomsskatt', text: 'Eiendomsskatt', value: 'eiendomsskatt' },
-      ],
-      utdanning: [
-        { key: 'generell', text: 'Generell', value: 'generell' },
-        { key: 'studielån', text: 'Studielån', value: 'studielån' },
-        { key: 'kurs/opplæring', text: 'Kurs- eller opplæringsavgifter', value: 'kurs/opplæring' },
-      ],
-      sparing_og_investering: [
-        { key: 'generell', text: 'Generell', value: 'generell' },
-        { key: 'pensjonssparing', text: 'Pensjonssparing', value: 'pensjonssparing' },
-        { key: 'aksjer/fond', text: 'Aksjer, fond eller andre investeringer', value: 'aksjer/fond' },
-        { key: 'nødsparing/langsiktig sparing', text: 'Nødsparing eller langsiktig sparing', value: 'nødsparing/langsiktig sparing' },
-        { key: 'buffer', text: 'Buffer', value: 'buffer' },
-      ],
-      diverse: [
-        { key: 'generell', text: 'Generell', value: 'generell' },
-        { key: 'mobil', text: 'Mobilregning', value: 'mobilregning' },
-        { key: 'internett', text: 'Internettregning', value: 'internett' },
-        { key: 'forbrukslån', text: 'Forbrukslån', value: 'forbrukslån' },
-        { key: 'reisekostnad', text: 'Reisekostnader og ferieplanlegging', value: 'reisekostnad' },
-      ]
-  };
-  
-  export const updateSubcategoryOptions = (category: string) => {
-    return categorySubcategoryMap[category] || [];
-  };
+  { key: 'Boligkostnader', text: 'Boligkostnader', value: 'Boligkostnader' },
+  { key: 'Mat og dagligvarer', text: 'Mat og dagligvarer', value: 'Mat og dagligvarer' },
+  { key: 'Transport', text: 'Transport', value: 'Transport' },
+  { key: 'Helse', text: 'Helse', value: 'Helse' },
+  { key: 'Personlig utgifter', text: 'Personlig utgifter', value: 'Personlig utgifter' },
+  { key: 'Underholdning', text: 'Underholdning', value: 'Underholdning' },
+  { key: 'Kommunale avgifter', text: 'Kommunale avgifter', value: 'Kommunale avgifter' },
+  { key: 'Utdanning', text: 'Utdanning', value: 'Utdanning' },
+  { key: 'Diverse', text: 'Diverse', value: 'Diverse' },
+  { key: 'Barneutgifter', text: 'Barneutgifter', value: 'Barneutgifter' },
+  { key: 'Sparing og investering', text: 'Sparing og investering', value: 'Sparing og investering' },
+];
+
+export const categorySubcategoryMap: { [key: string]: any[] } = {
+  'Boligkostnader': [
+      { key: 'Generell', text: 'Generell', value: 'Generell' },
+      { key: 'Husleie', text: 'Husleie', value: 'Husleie' },
+      { key: 'Boliglån', text: 'Boliglån', value: 'Boliglån' },
+      { key: 'Strømregning', text: 'Strømregning', value: 'Strømregning' },
+      { key: 'Internett', text: 'Internett', value: 'Internett' },
+      { key: 'Vann- og avløpsavgift', text: 'Vann- og avløpsavgift', value: 'Vann- og avløpsavgift' },
+      { key: 'Forsikringer (hjem, innbo osv)', text: 'Forsikringer (hjem, innbo osv)', value: 'Forsikringer (hjem, innbo osv)' },
+  ],
+  'Mat og dagligvarer': [
+      { key: 'Generell', text: 'Generell', value: 'Generell' },
+      { key: 'Matvarer', text: 'Matvarer', value: 'Matvarer' },
+      { key: 'Toalettsaker', text: 'Toalettsaker', value: 'Toalettsaker' },
+      { key: 'Husholdningsartikler', text: 'Husholdningsartikler', value: 'Husholdningsartikler' },
+  ],
+  'Transport': [
+      { key: 'Generell', text: 'Generell', value: 'Generell' },
+      { key: 'Bensin/Diesel', text: 'Bensin/Diesel', value: 'Bensin/Diesel' },
+      { key: 'Bilforsikring', text: 'Bilforsikring', value: 'Bilforsikring' },
+      { key: 'Billån', text: 'Billån', value: 'Billån' },
+      { key: 'Vedlikehold/reparasjon', text: 'Vedlikehold/reparasjon', value: 'Vedlikehold/reparasjon' },
+      { key: 'Offentlig transportbillett', text: 'Offentlig transportbillett', value: 'Offentlig transportbillett' },
+      { key: 'Strøm El-bil', text: 'Strøm El-bil', value: 'Strøm El-bil' },
+      { key: 'Bompenger', text: 'Bompenger', value: 'Bompenger' },
+  ],
+  'Helse': [
+      { key: 'Generell', text: 'Generell', value: 'Generell' },
+      { key: 'Legetime/tannlege', text: 'Legetime- eller tannlegebesøk', value: 'Legetime- eller tannlegebesøk' },
+      { key: 'Medisiner og reseptbelagte kostnader', text: 'Medisiner og reseptbelagte kostnader', value: 'Medisiner og reseptbelagte kostnader' },
+      { key: 'Briller og linser', text: 'Briller og linser', value: 'Briller og linser' },
+      { key: 'Helseforsikring', text: 'Helseforsikring', value: 'Helseforsikring' },
+  ],
+  'Personlig utgifter': [
+      { key: 'Generell', text: 'Generell', value: 'Generell' },
+      { key: 'Treningssenter', text: 'Treningssenter', value: 'Treningssenter' },
+      { key: 'Klær og sko', text: 'Klær og sko', value: 'Klær og sko' },
+      { key: 'Frisør- eller skjønnhetsbehandlinger', text: 'Frisør- eller skjønnhetsbehandlinger', value: 'Frisør- eller skjønnhetsbehandlinger' },
+      { key: 'Gaver', text: 'Gaver', value: 'Gaver' },
+  ],
+  'Underholdning': [
+      { key: 'Generell', text: 'Generell', value: 'Generell' },
+      { key: 'Kino- eller teaterbilletter', text: 'Kino- eller teaterbilletter', value: 'Kino- eller teaterbilletter' },
+      { key: 'Restauranter og kafeer', text: 'Restauranter og kafeer', value: 'Restauranter og kafeer' },
+  ],
+  'Kommunale avgifter': [
+      { key: 'Generell', text: 'Generell', value: 'Generell' },
+      { key: 'Renovasjonsavgift', text: 'Renovasjonsavgift', value: 'Renovasjonsavgift' },
+      { key: 'Eiendomsskatt', text: 'Eiendomsskatt', value: 'Eiendomsskatt' },
+  ],
+  'Utdanning': [
+      { key: 'Generell', text: 'Generell', value: 'Generell' },
+      { key: 'Studielån', text: 'Studielån', value: 'Studielån' },
+      { key: 'Kurs- eller opplæringsavgifter', text: 'Kurs- eller opplæringsavgifter', value: 'Kurs- eller opplæringsavgifter' },
+  ],
+  'Sparing og investering': [
+      { key: 'Generell', text: 'Generell', value: 'Generell' },
+      { key: 'Pensjonssparing', text: 'Pensjonssparing', value: 'Pensjonssparing' },
+      { key: 'Aksjer, fond eller andre investeringer', text: 'Aksjer, fond eller andre investeringer', value: 'Aksjer, fond eller andre investeringer' },
+      { key: 'Nødsparing eller langsiktig sparing', text: 'Nødsparing eller langsiktig sparing', value: 'Nødsparing eller langsiktig sparing' },
+      { key: 'Buffer', text: 'Buffer', value: 'Buffer' },
+  ],
+  'Barneutgifter': [
+      { key: 'Generell', text: 'Generell', value: 'Generell' },
+      { key: 'Barnebidrag', text: 'Barnebidrag', value: 'Barnebidrag' },
+      { key: 'Barnehage', text: 'Barnehage', value: 'Barnehage' },
+      { key: 'SFO', text: 'SFO', value: 'SFO' },
+      { key: 'Aktivitet', text: 'Aktivitet', value: 'Aktivitet' },
+  ],
+  'Diverse': [
+      { key: 'Generell', text: 'Generell', value: 'Generell' },
+      { key: 'Mobilregning', text: 'Mobilregning', value: 'Mobilregning' },
+      { key: 'Streaming', text: 'Streaming', value: 'Streaming' },
+      { key: 'Internett', text: 'Internett', value: 'Internett' },
+      { key: 'Forbrukslån', text: 'Forbrukslån', value: 'Forbrukslån' },
+      { key: 'Reisekostnader og ferieplanlegging', text: 'Reisekostnader og ferieplanlegging', value: 'Reisekostnader og ferieplanlegging' },
+  ],
+};
+
+export const updateSubcategoryOptions = (category: string) => {
+  return categorySubcategoryMap[category] || [];
+};

@@ -1,12 +1,13 @@
 import { Container, Header, Button, Icon } from 'semantic-ui-react';
 import '../../App.css';
+import { Link } from 'react-router-dom';
 
 interface Props {
   mobile: any;
 }
 
 const HomepageHeading = ({ mobile }: Props) => (
-  <Container fluid textAlign='center' style={{ backgroundColor: '#1b1c1d', padding: '3rem 0', color: 'white' }}>
+  <Container fluid textAlign='center' style={{ backgroundColor: '#1b1c1d', padding: '7rem 0', color: 'white' }}>
     <Header
       as='h1'
       content='Få kontroll på økonomien'
@@ -28,9 +29,9 @@ const HomepageHeading = ({ mobile }: Props) => (
         marginTop: mobile ? '0.5em' : '1.5em',
       }}
     />
-    <Button primary size='huge'>
+    <Button primary size='huge' as={Link} to={`/createBudget`}>
       Kom i gang!
-      <Icon />
+      <Icon name='arrow right'/>
     </Button>
   </Container>
 );

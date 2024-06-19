@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Budgets;
 using Domain;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -12,10 +13,14 @@ namespace API.Controllers
     public class BudgetController : BaseApiController
     {
         private readonly BudgetContext _context;
+         private readonly IMediator _mediator;
 
-        public BudgetController(BudgetContext context)
+
+        public BudgetController(BudgetContext context, IMediator mediator)
         {
             _context = context;
+            _mediator = mediator;
+
         }
 
         [HttpGet] //api/budget
@@ -60,6 +65,7 @@ namespace API.Controllers
             await Mediator.Send(new Edit.Command { Budget = budget });
             return Ok();
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
