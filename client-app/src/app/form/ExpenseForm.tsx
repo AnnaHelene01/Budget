@@ -12,6 +12,8 @@ interface ExpenseFormProps {
 }
 
 const ExpenseForm: React.FC<ExpenseFormProps> = ({ onExpenseChange, onRemoveExpense, expenses }) => {
+  // Hvis expenses er null, returner en tom array for å unngå feilen
+  const safeExpenses = expenses || [];  
   const [individualSubcategories, setIndividualSubcategories] = useState<{ [key: number]: any[] }>({});
   const [totalExpense, setTotalExpense] = useState<number>(0);
 
@@ -47,7 +49,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onExpenseChange, onRemoveExpe
   return (
     <>
       <Grid columns={5} stackable>
-        {expenses.map((expense, index) => (
+        {safeExpenses.map((expense, index) => (
           <Grid.Row key={index}>
             <Grid.Column>
               <Form.Field>

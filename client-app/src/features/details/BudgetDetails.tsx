@@ -12,25 +12,20 @@ export default observer(function BudgetDetails() {
     const { id } = useParams<{ id: string }>();
 
     useEffect(() => {
-        if (id) {
-            console.log("Loading budget with id:", id);
-            loadBudget(id).then(() => {
-            }).catch(error => {
-                console.error("Error loading budget:", error);
-            });
-        }
+        if (id) loadBudget(id);
     }, [id, loadBudget]);
 
-    if (loadingInitial || !budget) return <LoadingComponent />;
+    if (loadingInitial || !budget) return <LoadingComponent content="Laster budsjett..." />;
 
     const remainingAmount = budget.totalNetIncome - budget.totalExpense;
 
     console.log("Rendering BudgetDetails with budget:", toJS(budget)); // Konsollogger budsjettet før rendering
 
+
     return (
         <>
             <Container style={{ marginTop: '8rem' }}>
-                <Header as="h1" style={{ marginTop: '5em', marginBottom: '2em' }} >{budget.name}</Header>
+                <Header as="h1" style={{ marginTop: '5em', marginBottom: '2em' }}>{budget.name}</Header>
                 <Segment>
                     <Header as="h2">
                         <Icon name="money bill alternate" />
@@ -69,14 +64,14 @@ export default observer(function BudgetDetails() {
                             </Table.Row>
                         </Table.Header>
                         <Table.Body>
-                            {budget.incomes.map(income => (
+                            {budget.incomes ? budget.incomes.map(income => (
                                 <Table.Row key={income.id}>
                                     <Table.Cell>{income.source}</Table.Cell>
                                     <Table.Cell>{income.grossAmount}</Table.Cell>
                                     <Table.Cell>{income.netAmount}</Table.Cell>
                                     <Table.Cell>{income.taxPercentage}%</Table.Cell>
                                 </Table.Row>
-                            ))}
+                            )) : <Table.Row><Table.Cell colSpan="4">Ingen inntekter</Table.Cell></Table.Row>}
                         </Table.Body>
                     </Table>
                 </Segment>
@@ -96,14 +91,14 @@ export default observer(function BudgetDetails() {
                             </Table.Row>
                         </Table.Header>
                         <Table.Body>
-                            {budget.expenses.map(expense => (
+                            {budget.expenses ? budget.expenses.map(expense => (
                                 <Table.Row key={expense.id}>
                                     <Table.Cell>{expense.category}</Table.Cell>
                                     <Table.Cell>{expense.subcategory}</Table.Cell>
                                     <Table.Cell>{expense.description}</Table.Cell>
                                     <Table.Cell>{expense.amount}</Table.Cell>
                                 </Table.Row>
-                            ))}
+                            )) : <Table.Row><Table.Cell colSpan="4">Ingen utgifter</Table.Cell></Table.Row>}
                         </Table.Body>
                     </Table>
                 </Segment>

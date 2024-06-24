@@ -13,16 +13,12 @@ namespace API.Controllers
             return HandleResult(await Mediator.Send(new List.Query(), ct));
         }
 
-        private IActionResult HandleResult(object value)
-        {
-            throw new NotImplementedException();
-        }
-
-        [HttpGet("{id}")] //api/budget/{id}
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetBudget(Guid id)
         {
-           return HandleResult(await Mediator.Send(new Details.Query{Id = id}));
+            return HandleResult(await Mediator.Send(new Details.Query { Id = id }));
         }
+
 
         [HttpPost]
         public async Task<IActionResult> CreateBudget([FromBody] Budget budget)

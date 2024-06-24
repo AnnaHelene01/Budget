@@ -55,7 +55,7 @@ axios.interceptors.response.use(async response => {
 
 const requests = {
     get: <T>(url: string) => {
-        console.log(`GET request to ${url}`);  // Debug log
+        //console.log(`GET request to ${url}`);  // Debug log
         return axios.get<T>(url).then(responseBody)
     },    
     post: <T>(url: string, body: {}) => axios.post<T>(url, body).then(responseBody),

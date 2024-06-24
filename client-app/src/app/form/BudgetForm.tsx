@@ -32,11 +32,19 @@ export default observer(function BudgetForm() {
     if (id) {
       loadBudget(id).then(budget => {
         if (budget) {
-          setBudget(budget);
+          const updatedBudget = {
+            ...budget,
+            incomes: budget.incomes || [],
+            expenses: budget.expenses || []
+          };
+          console.log("Updated budget state:", updatedBudget); // Debugging
+          setBudget(updatedBudget);
         }
       });
     }
   }, [id, loadBudget]);
+  
+  
 
   useEffect(() => {
     const totalGrossIncome = budget.incomes.reduce((total, income) => total + income.grossAmount, 0);

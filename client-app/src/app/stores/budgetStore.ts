@@ -26,7 +26,9 @@ export default class BudgetStore {
             });
         } catch (error) {
             console.log(error);
-            this.setLoadingInitial(false);
+            runInAction(() => {
+                this.setLoadingInitial(false);
+            });
         }
     }
 
@@ -40,14 +42,19 @@ export default class BudgetStore {
             try {
                 budget = await agent.Budgets.details(id);
                 runInAction(() => {
+                    console.log("Budget loaded from API:", budget); // Logg dataene fra API
                     this.setBudget(budget!);
                     this.selectedBudget = budget;
+                    console.log("Selected budget after setting:", this.selectedBudget); // Logg valgt budsjett
                     this.setLoadingInitial(false);
                 });
                 return budget;
             } catch (error) {
                 console.log(error);
-                this.setLoadingInitial(false);
+                runInAction(() => {
+                    this.selectedBudget = undefined;
+                    this.setLoadingInitial(false);
+                });
             }
         }
     }
@@ -85,7 +92,9 @@ export default class BudgetStore {
           });
         } catch (error) {
           console.log(error);
-          runInAction(() => this.loading = false);
+          runInAction(() => {
+            this.loading = false;
+          });
         }
       }
       
@@ -98,28 +107,29 @@ export default class BudgetStore {
             this.selectedBudget = budget;
             this.editMode = false;
             this.loading = false;
-          })
+          });
         } catch (error) {
           console.log("UpdateError", error);
           runInAction(() => {
             this.loading = false;
-          })
+          });
         }
       }
     
-    
-
     deleteBudget = async (id: string) => {
         this.loading = true;
         try {
-            await agent.Budgets.delete(id);
-            runInAction(() => {
-                this.budgetRegistry.delete(id);
-                this.loading = false;
-            });
+          await agent.Budgets.delete(id);
+          runInAction(() => {
+            this.budgetRegistry.delete(id); // Fjern budsjett fra lokal tilstand (Map)
+            this.loading = false;
+          });
         } catch (error) {
-            console.log(error);
-            runInAction(() => this.loading = false);
+          console.log(error);
+          runInAction(() => {
+            this.loading = false;
+          });
+          throw error;
         }
-    }
+      };
 }

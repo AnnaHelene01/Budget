@@ -1,7 +1,7 @@
-
 using Application.Core;
 using Domain;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 namespace Application.Budgets
@@ -21,8 +21,13 @@ namespace Application.Budgets
             }
             public async Task<Result<Budget>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var budget = await _context.Budgets.FindAsync(request.Id);
+                var budget = await _context.Budgets
+                    .Include(b => b.Incomes) // Inkluder inntekter
+                    .Include(b => b.Expenses) // Inkluder utgifter
+                    .FirstOrDefaultAsync(b => b.Id == request.Id); // Bruk FirstOrDefaultAsync for å få budsjettet
                 
+                if (budget == null) return Result<Budget>.Failure("Budget not found");
+
                 return Result<Budget>.Success(budget);
             }
         }

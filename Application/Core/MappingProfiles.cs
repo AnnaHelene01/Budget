@@ -7,7 +7,9 @@ namespace Application.Core
     {
         public MappingProfiles()
         {
-            CreateMap<Budget, Budget>();
+            CreateMap<Budget, Budget>()
+                .ForMember(dest => dest.Incomes, opt => opt.MapFrom(src => src.Incomes)) // Kartlegg Incomes fra src til dest
+                .ForMember(dest => dest.Expenses, opt => opt.MapFrom(src => src.Expenses)); // Kartlegg Expenses fra src til dest
         }
     }
 }

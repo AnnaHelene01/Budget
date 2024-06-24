@@ -23,13 +23,34 @@ namespace Application.Budgets
 
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var budget = await _context.Budgets.FindAsync(request.Id);
-                if (budget == null) return null;
-                _context.Remove(budget);
+                // Finn budsjettet inkludert alle inntekter og utgifter
+                var budget = await _context.Budgets
+                    .Include(b => b.Incomes)
+                    .Include(b => b.Expenses)
+                    .FirstOrDefaultAsync(b => b.Id == request.Id, cancellationToken);
 
-                var result = await _context.SaveChangesAsync() > 0;
-                if (!result) return Result<Unit>.Failure("Failed to delete the activity");
-                return Result<Unit>.Success(Unit.Value);
+                if (budget == null)
+                {
+                    return Result<Unit>.Failure("Budget not found");
+                }
+
+                // Slett tilknyttede inntekter og utgifter
+                _context.Incomes.RemoveRange(budget.Incomes);
+                _context.Expenses.RemoveRange(budget.Expenses);
+                
+                // Slett budsjettet
+                _context.Budgets.Remove(budget);
+
+                var result = await _context.SaveChangesAsync(cancellationToken);
+
+                if (result > 0)
+                {
+                    return Result<Unit>.Success(Unit.Value);
+                }
+                else
+                {
+                    return Result<Unit>.Failure("Failed to delete the budget");
+                }
             }
         }
     }

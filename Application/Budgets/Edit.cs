@@ -23,29 +23,39 @@ namespace Application.Budgets
             }
         }
 
-        public class Handler : IRequestHandler<Command, Result<Unit>>
-        {
-            private readonly BudgetContext _context;
-            private readonly IMapper _mapper;
-            public Handler(BudgetContext context, IMapper mapper)
-            {
-                _context = context;
-                _mapper = mapper;
-            }
-            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
-            {
-                var budget = await _context.Budgets.FindAsync(request.Budget.Id);
+ public class Handler : IRequestHandler<Command, Result<Unit>>
+{
+    private readonly BudgetContext _context;
+    private readonly IMapper _mapper;
 
-                if (budget == null) return null;
-                
-                _mapper.Map(request.Budget, budget);
+    public Handler(BudgetContext context, IMapper mapper)
+    {
+        _context = context;
+        _mapper = mapper;
+    }
 
-                var result = await _context.SaveChangesAsync() > 0;
+    public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+    {
+        var budget = await _context.Budgets.FindAsync(request.Budget.Id);
 
-                if (!result) return Result<Unit>.Failure("Failed to update budget");
+        if (budget == null) return Result<Unit>.Failure("Budget not found");
 
-                return Result<Unit>.Success(Unit.Value);
-            }
-        }
+        // Map only scalar properties (excluding incomes and expenses) manually
+        budget.Name = request.Budget.Name;
+        budget.TotalGrossIncome = request.Budget.TotalGrossIncome;
+        budget.TotalNetIncome = request.Budget.TotalNetIncome;
+        budget.TotalExpense = request.Budget.TotalExpense;
+        // Map incomes and expenses using AutoMapper
+        _mapper.Map(request.Budget.Incomes, budget.Incomes); // Make sure this is correctly configured in AutoMapper
+        _mapper.Map(request.Budget.Expenses, budget.Expenses); // Make sure this is correctly configured in AutoMapper
+
+        var result = await _context.SaveChangesAsync() > 0;
+
+        if (!result) return Result<Unit>.Failure("Failed to update budget");
+
+        return Result<Unit>.Success(Unit.Value);
+    }
+}
+
     }
 }
