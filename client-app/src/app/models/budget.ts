@@ -10,7 +10,7 @@ export interface Budget {
 }
 
 export interface Income {
-    id: string;
+    id?: string;
     source: string;
     grossAmount: number;
     netAmount: number;
@@ -18,7 +18,7 @@ export interface Income {
 }
 
 export interface Expense {
-    id: string;
+    id?: string;
     category: string;
     subcategory: string;
     description: string;

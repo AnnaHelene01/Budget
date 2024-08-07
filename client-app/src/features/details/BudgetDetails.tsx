@@ -4,7 +4,7 @@ import { useStore } from "../../app/stores/store";
 import { Link, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import LoadingComponent from "../../app/layout/LoadingComponent";
-import { toJS } from "mobx"; // Importer toJS fra MobX
+//import { toJS } from "mobx"; // Importer toJS fra MobX
 
 export default observer(function BudgetDetails() {
     const { budgetStore } = useStore();
@@ -19,7 +19,7 @@ export default observer(function BudgetDetails() {
 
     const remainingAmount = budget.totalNetIncome - budget.totalExpense;
 
-    console.log("Rendering BudgetDetails with budget:", toJS(budget)); // Konsollogger budsjettet før rendering
+    //console.log("Rendering BudgetDetails with budget:", toJS(budget)); // Konsollogger budsjettet før rendering
 
 
     return (

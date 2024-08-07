@@ -59,23 +59,48 @@ export default observer(function BudgetForm() {
   }, [budget.incomes, budget.expenses]);
 
   function handleSubmit() {
-    const cleanedBudget = {
-      ...budget,
-      incomes: budget.incomes.map(income => ({ ...income })),
-      expenses: budget.expenses.map(expense => ({ ...expense }))
+    // Funksjoner for å rense inntekter og utgifter
+    const cleanIncome = (income: Income) => ({
+        source: income.source,
+        grossAmount: income.grossAmount,
+        netAmount: income.netAmount,
+        taxPercentage: income.taxPercentage
+        // ID blir ikke sendt for nye poster
+    });
+
+    const cleanExpense = (expense: Expense) => ({
+        category: expense.category,
+        subcategory: expense.subcategory,
+        description: expense.description,
+        amount: expense.amount
+        // ID blir ikke sendt for nye poster
+    });
+
+    // Rens budsjettdataene
+    const cleanedBudget: Omit<Budget, 'incomes' | 'expenses'> & {
+        incomes: ReturnType<typeof cleanIncome>[];
+        expenses: ReturnType<typeof cleanExpense>[];
+    } = {
+        ...budget,
+        incomes: budget.incomes.map(cleanIncome),
+        expenses: budget.expenses.map(cleanExpense)
     };
 
+    // Håndter opprettelse eller oppdatering av budsjett
     if (!cleanedBudget.id) {
-      cleanedBudget.id = uuid();
-      createBudget(cleanedBudget)
-        .then(() => navigate(`/budget/${cleanedBudget.id}`))
-        .catch(error => console.error('Error creating budget:', error.response?.data || error.message));
+        cleanedBudget.id = uuid(); // Generer ID kun ved opprettelse
+        createBudget(cleanedBudget)
+            .then(() => navigate(`/budget/${cleanedBudget.id}`))
+            .catch(error => console.error('Error creating budget:', error.response?.data || error.message));
     } else {
-      updateBudget(cleanedBudget)
-        .then(() => navigate(`/budget/${cleanedBudget.id}`))
-        .catch(error => console.error('Error updating budget:', error.response?.data || error.message));
+        updateBudget(cleanedBudget)
+            .then(() => navigate(`/budget/${cleanedBudget.id}`))
+            .catch(error => console.error('Error updating budget:', error.response?.data || error.message));
     }
-  }
+}
+
+
+
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = event.target;
