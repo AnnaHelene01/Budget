@@ -7,7 +7,7 @@ interface Props {
 }
 
 const HomepageHeading = ({ mobile }: Props) => (
-  <Container fluid textAlign='center' style={{ backgroundColor: '#1b1c1d', padding: '7rem 0', color: 'white' }}>
+  <Container fluid textAlign='center' style={{ backgroundColor: '#1b1c1d', padding: '9rem 0', color: 'white' }}>
     <Header
       as='h1'
       content='Få kontroll på økonomien'

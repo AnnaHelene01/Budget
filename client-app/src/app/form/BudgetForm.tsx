@@ -1,5 +1,5 @@
 import { useEffect, useState, ChangeEvent } from 'react';
-import { Button, Container, Form, Header, Icon, Segment } from 'semantic-ui-react';
+import { Button, Container, Form, Header, Icon, Segment, Modal } from 'semantic-ui-react';
 import { Budget, Expense, Income } from '../models/budget';
 import IncomeForm from './IncomeForm';
 import ExpenseForm from './ExpenseForm';
@@ -25,6 +25,9 @@ export default observer(function BudgetForm() {
     incomes: [],
     expenses: []
   });
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isEditMode = !!id;
 
@@ -58,49 +61,72 @@ export default observer(function BudgetForm() {
     }));
   }, [budget.incomes, budget.expenses]);
 
-  function handleSubmit() {
-    // Funksjoner for å rense inntekter og utgifter
-    const cleanIncome = (income: Income) => ({
-        source: income.source,
-        grossAmount: income.grossAmount,
-        netAmount: income.netAmount,
-        taxPercentage: income.taxPercentage
-        // ID blir ikke sendt for nye poster
-    });
+  // Flytt ut funksjoner for å rense inntekter og utgifter
+  const cleanIncome = (income: Income) => ({
+    source: income.source,
+    grossAmount: income.grossAmount,
+    netAmount: income.netAmount,
+    taxPercentage: income.taxPercentage
+  });
 
-    const cleanExpense = (expense: Expense) => ({
-        category: expense.category,
-        subcategory: expense.subcategory,
-        description: expense.description,
-        amount: expense.amount
-        // ID blir ikke sendt for nye poster
-    });
+  const cleanExpense = (expense: Expense) => ({
+    category: expense.category,
+    subcategory: expense.subcategory,
+    description: expense.description,
+    amount: expense.amount
+  });
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault(); // Forhindre standard submit handling
 
     // Rens budsjettdataene
     const cleanedBudget: Omit<Budget, 'incomes' | 'expenses'> & {
-        incomes: ReturnType<typeof cleanIncome>[];
-        expenses: ReturnType<typeof cleanExpense>[];
+      incomes: ReturnType<typeof cleanIncome>[];
+      expenses: ReturnType<typeof cleanExpense>[];
     } = {
+      ...budget,
+      incomes: budget.incomes.map(cleanIncome),
+      expenses: budget.expenses.map(cleanExpense)
+    };
+
+    // Vise modal hvis utgiftene overstiger inntektene
+    if (cleanedBudget.netAmount < 0) {
+      setIsModalOpen(true);
+      setIsSubmitting(true); // Sett isSubmitting til true når modal er åpen
+    } else {
+      // Hvis ikke i modal, send skjemaet umiddelbart
+      submitBudget(cleanedBudget);
+    }
+  }
+
+  function submitBudget(cleanedBudget: Omit<Budget, 'incomes' | 'expenses'> & {
+    incomes: ReturnType<typeof cleanIncome>[];
+    expenses: ReturnType<typeof cleanExpense>[];
+  }) {
+    if (!cleanedBudget.id) {
+      cleanedBudget.id = uuid(); // Generer ID kun ved opprettelse
+      createBudget(cleanedBudget)
+        .then(() => navigate(`/budget/${cleanedBudget.id}`))
+        .catch(error => console.error('Error creating budget:', error.response?.data || error.message));
+    } else {
+      updateBudget(cleanedBudget)
+        .then(() => navigate(`/budget/${cleanedBudget.id}`))
+        .catch(error => console.error('Error updating budget:', error.response?.data || error.message));
+    }
+  }
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    if (isSubmitting) {
+      // Hvis modal var åpen og er lukket, send skjemaet
+      submitBudget({
         ...budget,
         incomes: budget.incomes.map(cleanIncome),
         expenses: budget.expenses.map(cleanExpense)
-    };
-
-    // Håndter opprettelse eller oppdatering av budsjett
-    if (!cleanedBudget.id) {
-        cleanedBudget.id = uuid(); // Generer ID kun ved opprettelse
-        createBudget(cleanedBudget)
-            .then(() => navigate(`/budget/${cleanedBudget.id}`))
-            .catch(error => console.error('Error creating budget:', error.response?.data || error.message));
-    } else {
-        updateBudget(cleanedBudget)
-            .then(() => navigate(`/budget/${cleanedBudget.id}`))
-            .catch(error => console.error('Error updating budget:', error.response?.data || error.message));
+      });
+      setIsSubmitting(false); // Nullstill isSubmitting etter innsending
     }
-}
-
-
-
+  };
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = event.target;
@@ -152,68 +178,86 @@ export default observer(function BudgetForm() {
   };
 
   if (loadingInitial) return <LoadingComponent content='Loading budget...' />;
-
   return (
     <Container style={{ marginTop: '10em', marginBottom: '8rem' }}>
-      <Header as="h2" icon textAlign="center">
-        <Icon name="money bill alternate" circular />
-        <Header.Content>Budsjett Skjema</Header.Content>
-      </Header>
+        <Header as="h2" icon textAlign="center">
+            <Icon name="money bill alternate" circular />
+            <Header.Content>Budsjett Skjema</Header.Content>
+        </Header>
 
-      <Form onSubmit={handleSubmit} autoComplete='off'>
-        <Segment>
-          <Header as="h3">
-            <Icon name="edit" />
-            <Header.Content>Budsjett Navn</Header.Content>
-          </Header>
-          <Form.Field>
-            <input
-              type="text"
-              placeholder="Enter budget name"
-              value={budget.name}
-              name="name"
-              onChange={handleInputChange}
-            />
-          </Form.Field>
-        </Segment>
+        <Form onSubmit={handleSubmit} autoComplete='off'>
+            <Segment>
+                <Header as="h3">
+                    <Icon name="edit" />
+                    <Header.Content>Budsjett Navn</Header.Content>
+                </Header>
+                <Form.Field>
+                    <input
+                        type="text"
+                        placeholder="Enter budget name"
+                        value={budget.name}
+                        name="name"
+                        onChange={handleInputChange}
+                    />
+                </Form.Field>
+            </Segment>
 
-        <Segment>
-          <Header as="h3">
-            <Icon name="arrow up" />
-            <Header.Content> Inntekter </Header.Content>
-          </Header>
-          <IncomeForm
-            incomes={budget.incomes}
-            onIncomeChange={handleIncomeChange}
-            onRemoveIncome={handleRemoveIncome}
-            isEditMode={isEditMode}
-          />
-          <Button onClick={handleAddIncome} type="button" color="green" icon style={{ marginTop: '20px' }}>
-            <Icon name="plus" />
-            Legg til inntekt
-          </Button>
-        </Segment>
+            <Segment>
+                <Header as="h3">
+                    <Icon name="arrow up" />
+                    <Header.Content> Inntekter </Header.Content>
+                </Header>
+                <IncomeForm
+                    incomes={budget.incomes}
+                    onIncomeChange={handleIncomeChange}
+                    onRemoveIncome={handleRemoveIncome}
+                    isEditMode={isEditMode}
+                />
+                <Button onClick={handleAddIncome} type="button" color="green" icon style={{ marginTop: '20px' }}>
+                    <Icon name="plus" />
+                    Legg til inntekt
+                </Button>
+            </Segment>
 
-        <Segment>
-          <Header as="h3">
-            <Icon name="arrow down" />
-            <Header.Content Content>Utgifter</Header.Content>
-          </Header>
-          <ExpenseForm
-            expenses={budget.expenses}
-            onExpenseChange={handleExpenseChange}
-            onRemoveExpense={handleRemoveExpense}
-            isEditMode={isEditMode}
-          />
-          <Button onClick={handleAddExpense} type="button" color="green" icon style={{ marginTop: '20px' }}>
-            <Icon name="plus" />
-            Legg til utgift
-          </Button>
-        </Segment>
+            <Segment>
+                <Header as="h3">
+                    <Icon name="arrow down" />
+                    <Header.Content>Utgifter</Header.Content>
+                </Header>
+                <ExpenseForm
+                    expenses={budget.expenses}
+                    onExpenseChange={handleExpenseChange}
+                    onRemoveExpense={handleRemoveExpense}
+                    isEditMode={isEditMode}
+                />
+                <Button onClick={handleAddExpense} type="button" color="green" icon style={{ marginTop: '20px' }}>
+                    <Icon name="plus" />
+                    Legg til utgift
+                </Button>
+            </Segment>
 
-        <Button type="submit" primary>Få Oversikt</Button>
-        <Button type='button' onClick={() => navigate('/budget')}>Avbryt</Button>
-      </Form>
+            <Button type="submit" primary>Få Oversikt</Button>
+            <Button type='button' onClick={() => navigate('/budget')}>Avbryt</Button>
+        </Form>
+
+        <Modal
+            open={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            size="small"
+        >
+            <Header icon='warning' content='Advarsel!' />
+            <Modal.Content>
+                <p>Utgiftene dine overstiger inntektene. Vurder å redusere utgiftene dine.</p>
+            </Modal.Content>
+            <Modal.Actions>
+                <Button color='red' onClick={handleModalClose}>
+                    <Icon name='checkmark' /> Gå Videre
+                </Button>
+                <Button color='grey' onClick={() => setIsModalOpen(false)}>
+                    <Icon name='close' /> Avbryt
+                </Button>
+            </Modal.Actions>
+        </Modal>
     </Container>
-  );
+);
 });
