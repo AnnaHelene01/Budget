@@ -3,13 +3,14 @@ using Domain;
 
 namespace Application.Core
 {
-    public class MappingProfiles : Profile
+public class MappingProfiles : Profile
+{
+    public MappingProfiles()
     {
-        public MappingProfiles()
-        {
-            CreateMap<Budget, Budget>()
-                .ForMember(dest => dest.Incomes, opt => opt.MapFrom(src => src.Incomes)) // Kartlegg Incomes fra src til dest
-                .ForMember(dest => dest.Expenses, opt => opt.MapFrom(src => src.Expenses)); // Kartlegg Expenses fra src til dest
-        }
+        CreateMap<Budget, Budget>(); // Map Budget til seg selv
+        CreateMap<Income, Income>(); // Map Income til seg selv
+        CreateMap<Expense, Expense>(); // Map Expense til seg selv
     }
+}
+
 }

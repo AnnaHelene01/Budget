@@ -3,6 +3,7 @@ using AutoMapper;
 using Domain;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 namespace Application.Budgets
@@ -23,7 +24,8 @@ namespace Application.Budgets
             }
         }
 
- public class Handler : IRequestHandler<Command, Result<Unit>>
+
+public class Handler : IRequestHandler<Command, Result<Unit>>
 {
     private readonly BudgetContext _context;
     private readonly IMapper _mapper;
@@ -36,26 +38,78 @@ namespace Application.Budgets
 
     public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
     {
-        var budget = await _context.Budgets.FindAsync(request.Budget.Id);
+        var budget = await _context.Budgets
+            .Include(b => b.Incomes)
+            .Include(b => b.Expenses)
+            .FirstOrDefaultAsync(b => b.Id == request.Budget.Id, cancellationToken);
 
         if (budget == null) return Result<Unit>.Failure("Budget not found");
 
-        // Map only scalar properties (excluding incomes and expenses) manually
-        budget.Name = request.Budget.Name;
-        budget.TotalGrossIncome = request.Budget.TotalGrossIncome;
-        budget.TotalNetIncome = request.Budget.TotalNetIncome;
-        budget.TotalExpense = request.Budget.TotalExpense;
-        // Map incomes and expenses using AutoMapper
-        _mapper.Map(request.Budget.Incomes, budget.Incomes); // Make sure this is correctly configured in AutoMapper
-        _mapper.Map(request.Budget.Expenses, budget.Expenses); // Make sure this is correctly configured in AutoMapper
+        try
+        {
+            budget.Name = request.Budget.Name;
+            budget.TotalGrossIncome = request.Budget.TotalGrossIncome;
+            budget.TotalNetIncome = request.Budget.TotalNetIncome;
+            budget.TotalExpense = request.Budget.TotalExpense;
+            budget.NetAmount = request.Budget.NetAmount;
 
-        var result = await _context.SaveChangesAsync() > 0;
+            // Update or add incomes
+            foreach (var income in request.Budget.Incomes)
+            {
+                var existingIncome = budget.Incomes.FirstOrDefault(i => i.Id == income.Id);
+                if (existingIncome != null)
+                {
+                    _mapper.Map(income, existingIncome);
+                }
+                else
+                {
+                    budget.Incomes.Add(income);
+                }
+            }
 
-        if (!result) return Result<Unit>.Failure("Failed to update budget");
+            // Remove incomes not in the request
+            foreach (var existingIncome in budget.Incomes.ToList())
+            {
+                if (!request.Budget.Incomes.Any(i => i.Id == existingIncome.Id))
+                {
+                    _context.Incomes.Remove(existingIncome);
+                }
+            }
 
-        return Result<Unit>.Success(Unit.Value);
+            // Update or add expenses
+            foreach (var expense in request.Budget.Expenses)
+            {
+                var existingExpense = budget.Expenses.FirstOrDefault(e => e.Id == expense.Id);
+                if (existingExpense != null)
+                {
+                    _mapper.Map(expense, existingExpense);
+                }
+                else
+                {
+                    budget.Expenses.Add(expense);
+                }
+            }
+
+            // Remove expenses not in the request
+            foreach (var existingExpense in budget.Expenses.ToList())
+            {
+                if (!request.Budget.Expenses.Any(e => e.Id == existingExpense.Id))
+                {
+                    _context.Expenses.Remove(existingExpense);
+                }
+            }
+
+            var result = await _context.SaveChangesAsync(cancellationToken) > 0;
+            if (!result) return Result<Unit>.Failure("Failed to update budget");
+
+            return Result<Unit>.Success(Unit.Value);
+        }
+        catch (Exception ex)
+        {
+            // Log exception details
+            return Result<Unit>.Failure($"Exception: {ex.Message}");
+        }
     }
 }
-
-    }
 }
+    }

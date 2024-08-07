@@ -37,36 +37,35 @@ export default observer(function BudgetForm() {
             incomes: budget.incomes || [],
             expenses: budget.expenses || []
           };
-          console.log("Updated budget state:", updatedBudget); // Debugging
           setBudget(updatedBudget);
         }
       });
     }
   }, [id, loadBudget]);
-  
-  
 
   useEffect(() => {
     const totalGrossIncome = budget.incomes.reduce((total, income) => total + income.grossAmount, 0);
     const totalNetIncome = budget.incomes.reduce((total, income) => total + income.netAmount, 0);
     const totalExpense = budget.expenses.reduce((total, expense) => total + expense.amount, 0);
+    const netAmount = totalNetIncome - totalExpense;
 
     setBudget(prev => ({
       ...prev,
       totalGrossIncome,
       totalNetIncome,
-      totalExpense
+      totalExpense,
+      netAmount
     }));
   }, [budget.incomes, budget.expenses]);
 
   function handleSubmit() {
-    const cleanedBudget: Budget = {
+    const cleanedBudget = {
       ...budget,
       incomes: budget.incomes.map(income => ({ ...income })),
       expenses: budget.expenses.map(expense => ({ ...expense }))
     };
 
-    if (!budget.id) {
+    if (!cleanedBudget.id) {
       cleanedBudget.id = uuid();
       createBudget(cleanedBudget)
         .then(() => navigate(`/budget/${cleanedBudget.id}`))
@@ -80,13 +79,13 @@ export default observer(function BudgetForm() {
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = event.target;
-    setBudget({ ...budget, [name]: value });
+    setBudget(prev => ({ ...prev, [name]: value }));
   }
 
   const handleIncomeChange = (index: number, updatedIncome: Income) => {
     const updatedIncomes = [...budget.incomes];
     updatedIncomes[index] = updatedIncome;
-    setBudget({ ...budget, incomes: updatedIncomes });
+    setBudget(prev => ({ ...prev, incomes: updatedIncomes }));
   };
 
   const handleAddIncome = () => {
@@ -102,13 +101,13 @@ export default observer(function BudgetForm() {
   const handleRemoveIncome = (index: number) => {
     const updatedIncomes = [...budget.incomes];
     updatedIncomes.splice(index, 1);
-    setBudget({ ...budget, incomes: updatedIncomes });
+    setBudget(prev => ({ ...prev, incomes: updatedIncomes }));
   };
 
   const handleExpenseChange = (index: number, updatedExpense: Expense) => {
     const updatedExpenses = [...budget.expenses];
     updatedExpenses[index] = updatedExpense;
-    setBudget({ ...budget, expenses: updatedExpenses });
+    setBudget(prev => ({ ...prev, expenses: updatedExpenses }));
   };
 
   const handleAddExpense = () => {
@@ -124,7 +123,7 @@ export default observer(function BudgetForm() {
   const handleRemoveExpense = (index: number) => {
     const updatedExpenses = [...budget.expenses];
     updatedExpenses.splice(index, 1);
-    setBudget({ ...budget, expenses: updatedExpenses });
+    setBudget(prev => ({ ...prev, expenses: updatedExpenses }));
   };
 
   if (loadingInitial) return <LoadingComponent content='Loading budget...' />;
@@ -156,7 +155,7 @@ export default observer(function BudgetForm() {
         <Segment>
           <Header as="h3">
             <Icon name="arrow up" />
-            <Header.Content>Inntekter</Header.Content>
+            <Header.Content> Inntekter </Header.Content>
           </Header>
           <IncomeForm
             incomes={budget.incomes}
@@ -164,18 +163,16 @@ export default observer(function BudgetForm() {
             onRemoveIncome={handleRemoveIncome}
             isEditMode={isEditMode}
           />
-          {!isEditMode && (
-            <Button onClick={handleAddIncome} type="button" color="green" icon style={{ marginTop: '20px' }}>
-              <Icon name="plus" />
-              Legg til inntekt
-            </Button>
-          )}
+          <Button onClick={handleAddIncome} type="button" color="green" icon style={{ marginTop: '20px' }}>
+            <Icon name="plus" />
+            Legg til inntekt
+          </Button>
         </Segment>
 
         <Segment>
           <Header as="h3">
             <Icon name="arrow down" />
-            <Header.Content>Utgifter</Header.Content>
+            <Header.Content Content>Utgifter</Header.Content>
           </Header>
           <ExpenseForm
             expenses={budget.expenses}
@@ -183,12 +180,10 @@ export default observer(function BudgetForm() {
             onRemoveExpense={handleRemoveExpense}
             isEditMode={isEditMode}
           />
-          {!isEditMode && (
-            <Button onClick={handleAddExpense} type="button" color="green" icon style={{ marginTop: '20px' }}>
-              <Icon name="plus" />
-              Legg til utgift
-            </Button>
-          )}
+          <Button onClick={handleAddExpense} type="button" color="green" icon style={{ marginTop: '20px' }}>
+            <Icon name="plus" />
+            Legg til utgift
+          </Button>
         </Segment>
 
         <Button type="submit" primary>Få Oversikt</Button>

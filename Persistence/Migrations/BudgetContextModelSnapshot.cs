@@ -17,7 +17,7 @@ namespace Persistence.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.6");
 
-            modelBuilder.Entity("Domain.Budget", b =>
+            modelBuilder.Entity("Budget", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -28,6 +28,9 @@ namespace Persistence.Migrations
 
                     b.Property<decimal>("NetAmount")
                         .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("RowVersion")
+                        .HasColumnType("BLOB");
 
                     b.Property<decimal>("TotalExpense")
                         .HasColumnType("TEXT");
@@ -101,19 +104,19 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Expense", b =>
                 {
-                    b.HasOne("Domain.Budget", null)
+                    b.HasOne("Budget", null)
                         .WithMany("Expenses")
                         .HasForeignKey("BudgetId");
                 });
 
             modelBuilder.Entity("Domain.Income", b =>
                 {
-                    b.HasOne("Domain.Budget", null)
+                    b.HasOne("Budget", null)
                         .WithMany("Incomes")
                         .HasForeignKey("BudgetId");
                 });
 
-            modelBuilder.Entity("Domain.Budget", b =>
+            modelBuilder.Entity("Budget", b =>
                 {
                     b.Navigation("Expenses");
 
