@@ -1,9 +1,10 @@
 using Domain;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence
 {
-    public class BudgetContext : DbContext
+    public class BudgetContext : IdentityDbContext<AppUser>
     {
         public BudgetContext(DbContextOptions options) : base(options)
         {

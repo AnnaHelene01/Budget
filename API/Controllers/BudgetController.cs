@@ -1,6 +1,7 @@
     using Application.Budgets;
     using Domain;
-    using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 
     namespace API.Controllers
