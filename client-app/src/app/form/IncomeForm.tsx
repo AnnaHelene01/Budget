@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import '../../App.css';
 import { Button, Icon, Grid, Input, Form as SemanticForm } from 'semantic-ui-react';
 import { Income } from '../models/budget';
 import { observer } from 'mobx-react-lite';

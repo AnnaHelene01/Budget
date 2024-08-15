@@ -57,7 +57,6 @@ const BudgetListItem: React.FC<Props> = ({ budget }) => {
             onClick={() => handleBudgetDelete(budget.id)}
             icon='trash alternate'
             content='Slett'
-            color='red'
           />
         </div>
       </Card.Content>

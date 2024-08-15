@@ -20,7 +20,8 @@ export default observer(function BudgetDetails() {
     const remainingAmount = budget.totalNetIncome - budget.totalExpense;
 
     //console.log("Rendering BudgetDetails with budget:", toJS(budget)); // Konsollogger budsjettet før rendering
-
+    console.log(budget);
+    
 
     return (
         <>
@@ -33,6 +34,10 @@ export default observer(function BudgetDetails() {
                     </Header>
                     <Table celled>
                         <Table.Body>
+                        <Table.Row>
+                                <Table.Cell>Totalt Brutto Inntekter</Table.Cell>
+                                <Table.Cell>{budget.totalGrossIncome}</Table.Cell>
+                            </Table.Row>
                             <Table.Row>
                                 <Table.Cell>Totalt Netto Inntekter</Table.Cell>
                                 <Table.Cell>{budget.totalNetIncome}</Table.Cell>
@@ -107,7 +112,7 @@ export default observer(function BudgetDetails() {
                     <Button primary as={Link} to={`/manage/${budget.id}`}>
                         <Icon name="edit" /> Rediger
                     </Button>
-                    <Button negative as={Link} to="/budget">
+                    <Button as={Link} to="/budget">
                         <Icon name="arrow left" /> Tilbake
                     </Button>
                 </Segment>

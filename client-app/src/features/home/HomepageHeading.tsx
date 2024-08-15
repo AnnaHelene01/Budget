@@ -1,16 +1,21 @@
 import { Container, Header, Button, Icon } from 'semantic-ui-react';
 import '../../App.css';
 import { Link } from 'react-router-dom';
+import { observer } from 'mobx-react-lite';
+import { useStore } from '../../app/stores/store';
 
 interface Props {
   mobile: any;
 }
 
-const HomepageHeading = ({ mobile }: Props) => (
+export default observer(function HomepageHeading(mobile: Props) {
+  const { userStore } = useStore(); 
+
+  return (
   <Container fluid textAlign='center' style={{ backgroundColor: '#1b1c1d', padding: '9rem 0', color: 'white' }}>
     <Header
       as='h1'
-      content='Få kontroll på økonomien'
+      content='Få kontroll på økonomien med ØkonomiPilot!'
       inverted
       style={{
         fontSize: mobile ? '2em' : '4em',
@@ -19,21 +24,20 @@ const HomepageHeading = ({ mobile }: Props) => (
         marginTop: mobile ? '1.5em' : '3em',
       }}
     />
-    <Header
-      as='h2'
-      content='Bli din beste ØkonomiPilot'
-      inverted
-      style={{
-        fontSize: mobile ? '1.5em' : '1.7em',
-        fontWeight: 'normal',
-        marginTop: mobile ? '0.5em' : '1.5em',
-      }}
-    />
-    <Button primary size='huge' as={Link} to={`/createBudget`}>
-      Kom i gang!
-      <Icon name='arrow right'/>
-    </Button>
+    {userStore.isLoggedIn ? (
+        <>
+        <Button primary size='huge' as={Link} to={`/budget`} style={{ marginTop: '4rem'}}>
+             Gå til mine budsjetter!
+            <Icon name='arrow right'/>
+        </Button>
+        </>
+    ) : (
+        <Button primary size='huge' as={Link} to={`/login`}>
+            Logg inn!
+            <Icon name='arrow right'/>
+        </Button>
+    )}
+ 
   </Container>
-);
-
-export default HomepageHeading;
+)
+})

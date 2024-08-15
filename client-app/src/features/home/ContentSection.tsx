@@ -1,10 +1,10 @@
 //ContentSection.tsx
 import { Container, Header, Image, Grid, Segment } from 'semantic-ui-react';
 import HeaderImg from '../../../public/assets/image.png';
+import { observer } from 'mobx-react-lite';
 
-const ContentSection = () => {
-
-
+export default observer(function ContentSection() {
+  
   return (
     <>
      <Segment style={{ padding: '8em 0em' }} vertical>
@@ -44,6 +44,4 @@ const ContentSection = () => {
     </>
   )
  
-};
-
-export default ContentSection;
+})

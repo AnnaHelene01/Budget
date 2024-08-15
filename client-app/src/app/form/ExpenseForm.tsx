@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../../App.css';
 import { Form, Button, Dropdown, DropdownProps, Grid, Icon } from 'semantic-ui-react';
 import { Expense } from '../models/budget';
 import { categoryOptions, updateSubcategoryOptions } from './CategoryOptions';
